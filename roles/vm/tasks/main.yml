@@ -1,0 +1,10 @@
+- name: set vm vars for ({{ dist }})
+  include_vars: "{{ dist }}/vm.yml"
+
+- name: set preseed vars for ({{ dist }})
+  include_vars: "{{ dist }}/preseed.yml"
+
+### Debian
+- name: start debian installation
+  include: install-vm-debian.yml
+  when: template_type == 'debian'

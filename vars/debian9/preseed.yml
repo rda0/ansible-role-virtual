@@ -1,0 +1,17 @@
+---
+locale: en_US.UTF-8
+keymap: us
+hostname: localhost
+domain: localdomain
+mirror_host: debian.ethz.ch
+mirror_dir: /debian
+root_password: ishnedistedi
+user_fullname: Debian User
+user_username: debian
+user_password: ishnedistedi
+time_zone: Europe/Zurich
+time_server: time1.phys.ethz.ch
+tasksel: minimal
+#tasksel: standard
+pkgsel: openssh-server build-essential python python-simplejson python-apt python-pycurl
+kernel_opts: nousb console=tty0,115200 console=ttyS0,115200
