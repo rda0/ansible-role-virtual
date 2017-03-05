@@ -1,0 +1,8 @@
+[Unit]
+After=sshd.service
+
+[Service]
+ExecStart=/usr/local/bin/ansible-notify.sh
+
+[Install]
+WantedBy=default.target

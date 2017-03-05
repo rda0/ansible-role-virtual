@@ -32,5 +32,12 @@
 - name: execute install-vm.sh
   command: "/bin/bash {{ vm_path }}/{{ guest_name }}/install-vm.sh"
 
-  #- name: wait for the vm to install
-  #local_action: pause minutes={{ vmwaittime }}
+- name: wait until vm is shut off
+  command: /usr/bin/virsh domstate {{ guest_name }}
+  register: result
+  until: result.stdout.find("shut off") != -1
+  retries: 1000
+  delay: 10
+
+- name: start vm
+  command: /usr/bin/virsh start {{ guest_name }}
