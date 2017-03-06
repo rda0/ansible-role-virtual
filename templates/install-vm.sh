@@ -15,7 +15,11 @@ virt-install \
 --console=pty,target_type=serial \
 --initrd-inject={{ vm_path }}/{{ guest_name }}/preseed.cfg \
 --extra-args='auto console=ttyS0,115200n8 serial' \
+{% if mac is defined %}
+--network=bridge={{ bridge }},model=virtio,mac={{ mac }} \
+{% else %}
 --network=bridge={{ bridge }},model=virtio \
+{% endif %}
 --nographics \
 --noautoconsole
 

@@ -1,0 +1,8 @@
+---
+template_type: debian
+dist_name: debian8
+os_variant: generic
+debian_name: jessie
+arch: amd64
+initrd_inject: preseed.cfg
+location: http://debian.ethz.ch/debian/dists/{{ debian_name }}/main/installer-{{ arch }}/

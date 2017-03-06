@@ -1,0 +1,8 @@
+---
+template_type: debian
+dist_name: ubuntu16.04
+os_variant: generic
+debian_name: xenial
+arch: amd64
+initrd_inject: preseed.cfg
+location: http://ubuntu.ethz.ch/ubuntu/dists/{{ debian_name }}/main/installer-{{ arch }}/

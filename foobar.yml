@@ -1,0 +1,14 @@
+- hosts: production
+  vars:
+    - vm_path: /root/vm
+    - web_path: /var/www/html/post-install
+    - web_url: http://baal.ethz.ch/post-install
+    - dist: ubuntu16.04
+    - guest_name: foobar
+    - vcpus: 1
+    - memory: 1024
+    - disk_size: 10
+    - bridge: br0
+    - mac: 52:54:00:36:50:2a
+  roles:
+    - { role: vm, tags: vm }
