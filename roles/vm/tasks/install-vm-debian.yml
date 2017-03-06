@@ -10,12 +10,12 @@
 
 - name: create preseed.cfg
   template:
-    src: debian/preseed.cfg
+    src: "{{ template_type }}/preseed.cfg"
     dest: "{{ vm_path }}/{{ guest_name }}/{{ initrd_inject }}"
 
 - name: create post-install.sh
   template:
-    src: debian/post-install.sh
+    src: "{{ template_type }}/post-install.sh"
     dest: "{{ web_path }}/{{ guest_name }}/post-install.sh"
     owner: root
     group: root

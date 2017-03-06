@@ -8,3 +8,9 @@
 - name: start debian installation
   include: install-vm-debian.yml
   when: template_type == 'debian'
+
+### Ubuntu
+- name: start ubuntu installation
+  include: install-vm-debian.yml
+  when: template_type == 'ubuntu'
+
