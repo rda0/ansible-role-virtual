@@ -1,0 +1,16 @@
+- hosts: production
+  vars:
+    - vm_path: /root/vm
+    - web_path: /var/www/html/post-install
+    - web_url: http://baal.ethz.ch/post-install
+    - dist: debian8
+    - guest_name: jessie
+    - vcpus: 1
+    - memory: 1024
+    - disk_size: 10
+    - bridge: virbr0
+  roles:
+    - { role: vm, tags: vm }
+  handlers:
+    - include: handlers/services.yml
+      static: yes
