@@ -3,10 +3,10 @@
     - vm_path: /root/vm
     - web_path: /var/www/html/post-install
     - web_url: http://baal.ethz.ch/post-install
-    - dist: debian8
+    - dist: debian9
     - guest_name: bar
-    - vcpus: 1
-    - memory: 1024
+    - vcpus: 2
+    - memory: 4096
     - disk_size: 10
     - bridge: br0
     - mac: 52:54:00:61:56:3e

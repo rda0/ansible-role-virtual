@@ -13,5 +13,5 @@ time_zone: Europe/Zurich
 time_server: time1.phys.ethz.ch
 tasksel: minimal
 #tasksel: standard
-pkgsel: openssh-server build-essential python python-simplejson python-apt python-pycurl host libwww-perl
+pkgsel: openssh-server build-essential python python-simplejson python-apt python-pycurl host libwww-perl acpi-support
 kernel_opts: nousb console=tty0,115200 console=ttyS0,115200
