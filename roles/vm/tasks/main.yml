@@ -4,6 +4,11 @@
 - name: set preseed vars for ({{ dist }})
   include_vars: "{{ dist }}/preseed.yml"
 
+- name: display all environment variables
+  debug:
+    var: environment
+    verbosity: 4
+
 ### Debian
 - name: start debian installation
   include: install-vm-debian.yml

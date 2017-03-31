@@ -1,0 +1,3 @@
+- hosts: production
+  roles:
+    - { role: dumpall, tags: dumpall }
