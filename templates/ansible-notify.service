@@ -1,5 +1,5 @@
 [Unit]
-After=sshd.service
+After=sshd.service network.target network-online.target
 
 [Service]
 ExecStart=/usr/local/bin/ansible-notify.sh
