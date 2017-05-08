@@ -1,0 +1,6 @@
+---
+template_type: windows
+dist_name: winsrv16
+os_variant: generic
+location: /opt/iso/windows/win_srv_16.iso
+driver: /opt/iso/windows/virtio-win.iso

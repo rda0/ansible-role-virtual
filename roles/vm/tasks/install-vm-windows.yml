@@ -1,0 +1,25 @@
+- name: create vm dir
+  file: path={{ item }} state=directory owner=root group=root mode=0700
+  with_items:
+    - "{{ vm_path }}/{{ guest_name }}"
+
+- name: create install-vm.sh
+  template:
+    src: install-vm-windows.sh
+    dest: "{{ vm_path }}/{{ guest_name }}/install-vm.sh"
+    owner: root
+    group: root
+    mode: 0770
+
+- name: execute install-vm.sh
+  command: "/bin/bash {{ vm_path }}/{{ guest_name }}/install-vm.sh"
+
+- name: wait until vm is shut off
+  command: /usr/bin/virsh domstate {{ guest_name }}
+  register: result
+  until: result.stdout.find("shut off") != -1
+  retries: 1000
+  delay: 10
+
+- name: start vm
+  command: /usr/bin/virsh start {{ guest_name }}

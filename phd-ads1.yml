@@ -1,0 +1,12 @@
+- hosts: production
+  vars:
+    - vm_path: /root/vm
+    - dist: winsrv16
+    - guest_name: phd-ads1
+    - vcpus: 4
+    - memory: 4096
+    - disk_size: 50
+    - bridge: br0
+    - mac: 52:54:00:10:42:8b
+  roles:
+    - { role: vm, tags: vm }

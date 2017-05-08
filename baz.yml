@@ -3,12 +3,12 @@
     - vm_path: /root/vm
     - web_path: /var/www/html/post-install
     - web_url: http://baal.ethz.ch/post-install
-    - dist: debian9
-    - guest_name: phd-ldap1
+    - dist: debian8
+    - guest_name: baz
     - vcpus: 4
     - memory: 4096
     - disk_size: 10
     - bridge: br0
-    - mac: 52:54:00:09:6d:78
+    - mac: 52:54:00:32:cb:5e
   roles:
     - { role: vm, tags: vm }

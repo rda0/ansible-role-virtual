@@ -19,3 +19,7 @@
   include: install-vm-debian.yml
   when: template_type == 'ubuntu'
 
+### Windows
+- name: start windows installation
+  include: install-vm-windows.yml
+  when: template_type == 'windows'
