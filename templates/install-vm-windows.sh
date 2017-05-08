@@ -2,14 +2,13 @@
 
 if [ ! -f /etc/libvirt/qemu/{{ guest_name }}.xml ]; then
 
-#qemu-img create -f qcow2 -o preallocation=metadata /var/lib/libvirt/images/{{ guest_name }}.qcow2 {{ disk_size }}
-
 virt-install \
 --virt-type=kvm \
 --name={{ guest_name }} \
 --vcpus={{ vcpus }} \
 --memory={{ memory }} \
---disk=/var/lib/libvirt/images/{{ guest_name }}.qcow2,format=qcow2,size={{ disk_size }},bus=virtio,cache=none \
+--controller type=scsi,model=virtio-scsi \
+--disk=/var/lib/libvirt/images/{{ guest_name }}.qcow2,format=qcow2,size={{ disk_size }},bus=scsi,cache=none \
 --cdrom={{ location }} \
 --os-type=windows \
 --os-variant={{ os_variant }} \
@@ -24,13 +23,12 @@ virt-install \
 --keymap=en-us \
 --noautoconsole
 
-#--controller type=scsi,model=virtio-scsi \
-#--disk path={{ driver }},device=cdrom \
-#--boot cdrom,fd,hd,network,menu=on \
-
-# virsh domblklist phd-ads1
-# virsh change-media phd-ads1 hda --eject
-# virsh change-media phd-ads1 hda /opt/iso/windows/virtio-win.iso --insert
+# virsh domblklist {{ guest_name }}
+# virsh change-media {{ guest_name }} <target> --eject
+# virsh change-media {{ guest_name }} <target> /opt/iso/windows/virtio-win.iso --insert
+# load virioscsi driver (2k16/amd64)
+# virsh change-media {{ guest_name }} <target> --eject
+# virsh change-media {{ guest_name }} <target> /opt/iso/windows/win_srv_16.iso --insert
 
 else
     echo "vm already defined!"

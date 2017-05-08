@@ -11,6 +11,18 @@
     group: root
     mode: 0770
 
+- debug:
+    msg:
+      - "run `virt-viewer --connect qemu:///system {{ guest_name }}` to connect via vnc"
+      - "click your way through the gui, when at the 'load drivers' screen, run:"
+      - "virsh domblklist {{ guest_name }}"
+      - "virsh change-media {{ guest_name }} <target> --eject"
+      - "get drivers from: https://fedoraproject.org/wiki/Windows_Virtio_Drivers"
+      - "virsh change-media {{ guest_name }} <target> /opt/iso/windows/virtio-win.iso --insert"
+      - "load driver: virioscsi driver (2k16/amd64)"
+      - "virsh change-media {{ guest_name }} <target> --eject"
+      - "virsh change-media {{ guest_name }} <target> /opt/iso/windows/win_srv_16.iso --insert"
+
 - name: execute install-vm.sh
   command: "/bin/bash {{ vm_path }}/{{ guest_name }}/install-vm.sh"
 

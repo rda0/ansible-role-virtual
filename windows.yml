@@ -1,0 +1,14 @@
+- hosts: production
+  vars:
+    - vm_path: /root/vm
+    - dist: win2k16
+    - guest_name: windows
+    - vcpus: 1
+    - memory: 2048
+    - disk_size: 30
+    - bridge: virbr0
+  roles:
+    - { role: vm, tags: vm }
+  handlers:
+    - include: handlers/services.yml
+      static: yes

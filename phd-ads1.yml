@@ -1,7 +1,7 @@
 - hosts: production
   vars:
     - vm_path: /root/vm
-    - dist: winsrv16
+    - dist: win2k16
     - guest_name: phd-ads1
     - vcpus: 4
     - memory: 4096
