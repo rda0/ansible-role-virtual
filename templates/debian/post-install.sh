@@ -36,7 +36,7 @@ chmod +x /usr/local/bin/ansible-notify.sh
 
 cat > /etc/systemd/system/ansible-notify.service << 'EOF'
 [Unit]
-After=sshd.service
+After=sshd.service network.target network-online.target
 
 [Service]
 ExecStart=/usr/local/bin/ansible-notify.sh
