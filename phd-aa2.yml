@@ -4,11 +4,11 @@
     - web_path: /var/www/html/post-install
     - web_url: http://baal.ethz.ch/post-install
     - dist: debian9
-    - guest_name: phd-auth3
+    - guest_name: phd-aa2
     - vcpus: 4
     - memory: 4096
     - disk_size: 10
     - bridge: br0
-    - mac: 52:54:00:0e:36:f9
+    - mac: 52:54:00:0f:f2:fa
   roles:
     - { role: vm, tags: vm }
