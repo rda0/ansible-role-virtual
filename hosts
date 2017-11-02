@@ -1,4 +1,4 @@
-baal.ethz.ch ansible_ssh_user=root ansible_sudo=no
+localhost ansible_ssh_user=root ansible_sudo=no
 
 [production]
-baal.ethz.ch
+localhost
