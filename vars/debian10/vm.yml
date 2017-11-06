@@ -6,5 +6,5 @@ debian_name: buster
 arch: amd64
 initrd_inject: preseed.cfg
 # switch back when stretch is released
-location: http://debian.ethz.ch/debian/dists/{{ debian_name }}/main/installer-{{ arch }}/
-#location: https://d-i.debian.org/daily-images/{{ arch }}/
+#location: http://debian.ethz.ch/debian/dists/{{ debian_name }}/main/installer-{{ arch }}/
+location: https://d-i.debian.org/daily-images/{{ arch }}/
