@@ -14,7 +14,7 @@ virt-install \
 --os-variant={{ os_variant }} \
 --console=pty,target_type=serial \
 --initrd-inject={{ vm_path }}/{{ guest_name }}/preseed.cfg \
---extra-args='auto console=ttyS0,115200n8 serial' \
+--extra-args='auto=true priority=critical console=ttyS0,115200n8 serial' \
 {% if mac is defined %}
 --network=bridge={{ bridge }},model=virtio,mac={{ mac }} \
 {% else %}
