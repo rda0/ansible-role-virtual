@@ -1,6 +1,0 @@
-- hosts: production
-  roles:
-    - { role: vm, tags: vm }
-  handlers:
-    - include: handlers/services.yml
-      static: yes
