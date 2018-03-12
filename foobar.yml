@@ -5,7 +5,7 @@
     - web_url: http://baal.ethz.ch/post-install
     - dist: debian9
     - guest_name: foobar
-    - vcpus: 4
+    - vcpus: 2
     - memory: 4096
     - disk_size: 10
     - bridge: br0
