@@ -1,0 +1,15 @@
+- name: create vm dir
+  file: path={{ item }} state=directory owner=root group=root mode=0700
+  with_items:
+    - "{{ vm_path }}/{{ guest_name }}"
+
+- name: create create-vm.sh
+  template:
+    src: create-vm.sh
+    dest: "{{ vm_path }}/{{ guest_name }}/create-vm.sh"
+    owner: root
+    group: root
+    mode: 0770
+
+- name: execute create-vm.sh
+  command: "/bin/bash {{ vm_path }}/{{ guest_name }}/create-vm.sh"

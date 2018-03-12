@@ -1,14 +1,13 @@
 - hosts: production
   vars:
     - vm_path: /root/vm
-    - web_path: /var/www/html/post-install
-    - web_url: http://phd-kvm1.ethz.ch/post-install
     - dist: debian9
+    - vg: r10
     - guest_name: phd-influx
+    - disk: 5G
     - vcpus: 1
     - memory: 4096
-    - disk_size: 5
     - bridge: br0
     - mac: 52:54:00:75:43:2a
   roles:
-    - { role: vm, tags: vm }
+    - { role: vm-create, tags: vm-create }
