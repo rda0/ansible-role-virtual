@@ -50,6 +50,17 @@
 - name: resize filesystem
   command: 'resize2fs /dev/{{ vg }}/{{ guest_name }}-root'
 
+- name: mount root filesystem
+  command: 'mount /dev/{{ vg }}/{{ guest_name }}-root /mnt'
+  args:
+    warn: false
+
+- name: set hostname
+  shell: 'echo "{{ guest_name }}" > /mnt/etc/hostname'
+
+- name: umount root filesystem
+  command: 'umount /dev/{{ vg }}/{{ guest_name }}-root'
+
 - name: create vm
   command: |
     virt-install \
