@@ -3,11 +3,11 @@
     - vm_path: /root/vm
     - dist: debian9
     - vg: r10
-    - guest_name: phd-influx
+    - guest_name: phd-tvm2
     - disk_size: 5G
     - vcpus: 1
     - memory: 4096
     - bridge: br0
-    - mac: 52:54:00:75:43:2a
+    - mac: 52:54:00:32:0e:8a
   roles:
     - { role: vm-create, tags: vm-create }
