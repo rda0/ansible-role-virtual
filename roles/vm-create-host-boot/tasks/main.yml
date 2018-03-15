@@ -42,7 +42,6 @@
     --vcpus={{ vcpus }} \
     --memory={{ memory }} \
     --memorybacking=hugepages=yes \
-    --memballoon=virtio \
     --controller=type=scsi,model=virtio-scsi \
     --disk=path=/dev/{{ vg }}/{{ guest_name }}-root,bus=scsi,cache=none \
     --os-type=linux \
