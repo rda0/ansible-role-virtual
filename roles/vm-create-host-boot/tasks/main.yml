@@ -43,7 +43,7 @@
     --memory={{ memory }} \
     --memorybacking=hugepages=yes \
     --controller=type=scsi,model=virtio-scsi \
-    --disk=path=/dev/{{ vg }}/{{ guest_name }}-root,bus=scsi,cache=none \
+    --disk=path=/dev/{{ vg }}/{{ guest_name }}-root,bus=scsi,cache=none,address.type=drive,address.controller=0,address.bus=0,address.target=0,address.unit=0 \
     --os-type=linux \
     --os-variant={{ os_variant }} \
     --console=pty,target_type=serial \
