@@ -2,7 +2,7 @@
   vars:
     - vm_path: /root/vm
     - web_path: /var/www/html/post-install
-    - web_url: http://phd-kvm1.ethz.ch/post-install
+    - web_url: http://osiris.ethz.ch/post-install
     - dist: debian9
     - vg: r10
     - guest_name: phd-tvm1
