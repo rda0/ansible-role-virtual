@@ -3,12 +3,12 @@
   vars:
     - dist: debian9
     - vg: r10
-    - guest_name: phd-influx
+    - guest_name: 
     - vcpus: 1
-    - memory: 4096
-    - disk_size: 4G
+    - memory: 1024
+    - disk_size: 2G
     - bridge: br0
-    - mac: 52:54:00:75:43:2a
+    - mac: 52:54:00:
     - disks:
         - mount: /var
           size: 2G
@@ -16,8 +16,5 @@
         - mount: /var/log
           size: 2G
           vg: r10
-        - mount: /var/lib/influxdb
-          size: 100G
-          vg: r6
   roles:
     - { role: vm-create, tags: vm-create }

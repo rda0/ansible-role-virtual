@@ -1,0 +1,16 @@
+---
+- hosts: production
+  vars:
+    - vm_path: /root/vm
+    - web_path: /var/www/html/post-install
+    - web_url: http://phd-kvm1.ethz.ch/post-install
+    - dist: debian8
+    - vg: r10
+    - guest_name: phd-test-ikiwiki
+    - vcpus: 2
+    - memory: 512
+    - disk_size: 5G
+    - bridge: br0
+    - mac: 52:54:00:38:b2:f3
+  roles:
+    - { role: vm-install, tags: vm-install }

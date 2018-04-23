@@ -9,15 +9,12 @@
 #    - disk_size: 2G
     - bridge: br0
     - mac: 52:54:00:70:e8:04
-    - disks:
-        - mount: /var
-          size: 2G
-          vg: r10
-        - mount: /var/log
-          size: 2G
-          vg: r10
-        - mount: /var/lib/influxdb
-          size: 2G
-          vg: r6
+#    - disks:
+#        - mount: /var
+#          size: 2G
+#          vg: r10
+#        - mount: /var/log
+#          size: 2G
+#          vg: r10
   roles:
     - { role: vm-create, tags: vm-create }
