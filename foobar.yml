@@ -1,0 +1,13 @@
+---
+- hosts: production
+  vars:
+    - dist: ubuntu18.04
+    - vg: r10
+    - guest_name: foobar
+    - vcpus: 1
+    - memory: 1024
+    - disk_size: 10G
+    - bridge: br0
+    - mac: 52:54:00:36:50:2a
+  roles:
+    - { role: vm-create, tags: vm-create }

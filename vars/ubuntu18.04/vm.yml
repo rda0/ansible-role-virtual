@@ -1,0 +1,8 @@
+---
+template_type: ubuntu
+dist_name: ubuntu18.04
+os_variant: generic
+debian_name: bionic
+arch: amd64
+initrd_inject: preseed.cfg
+location: http://ubuntu.ethz.ch/ubuntu/dists/{{ debian_name }}/main/installer-{{ arch }}/
