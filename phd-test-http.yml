@@ -1,12 +1,12 @@
 ---
 - hosts: production
   vars:
-    - dist: debian9
+    - dist: ubuntu18.04
     - vg: r10
     - guest_name: phd-test-http
-    - vcpus: 1
-    - memory: 1024
-    - disk_size: 10G
+    - vcpus: 4
+    - memory: 8192
+    - disk_size: 20G
     - bridge: br0
     - mac: 52:54:00:68:ec:bc
   roles:

@@ -4,8 +4,8 @@
     - dist: debian9
     - vg: r10
     - guest_name: foo
-    - vcpus: 1
-    - memory: 1024
+    - vcpus: 2
+    - memory: 4096
     - disk_size: 10G
     - bridge: br0
     - mac: 52:54:00:22:9e:77

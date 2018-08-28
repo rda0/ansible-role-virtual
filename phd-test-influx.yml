@@ -3,11 +3,15 @@
   vars:
     - dist: debian9
     - vg: r10
-    - guest_name: bar
+    - guest_name: phd-test-influx
     - vcpus: 2
     - memory: 4096
-    - disk_size: 10G
+    - disk_size: 2G
     - bridge: br0
-    - mac: 52:54:00:61:56:3e
+    - mac: 52:54:00:01:71:c4
+    - disks:
+        - mount: /var
+          size: 200G
+          vg: r10
   roles:
     - { role: vm-create, tags: vm-create }
