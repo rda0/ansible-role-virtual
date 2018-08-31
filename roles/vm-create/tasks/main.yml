@@ -32,9 +32,9 @@
   when: guest_xml.stat.exists is defined and guest_xml.stat.exists == True
 
 - stat:
-    path: "/dev/{{ item.vg }}/{{ guest_name }}{{ item.mount|replace('/', '-') }}"
+    path: "{% set letters='cdefghijklmnopqrstuvwxyz' %}/dev/{{ item.1.vg }}/{{ guest_name }}{{ item.1.mount|default('/dev/sd' + letters[item.0])|replace('/', '-') }}"
   register: guest_lvm_disks
-  with_items: '{{ disks }}'
+  with_indexed_items: '{{ disks }}'
   when: disks is defined
 
 - fail:
@@ -56,10 +56,10 @@
 
 - name: create disk lvs
   lvol:
-    vg: '{{ item.vg }}'
-    lv: "{{ guest_name }}{{ item.mount|replace('/', '-') }}"
-    size: "{{ item.size }}"
-  with_items: '{{ disks }}'
+    vg: '{{ item.1.vg }}'
+    lv: "{% set letters='cdefghijklmnopqrstuvwxyz' %}{{ guest_name }}{{ item.1.mount|default('/dev/sd' + letters[item.0])|replace('/', '-') }}"
+    size: "{{ item.1.size }}"
+  with_indexed_items: '{{ disks }}'
   when: disks is defined
 
 - name: dump boot disk from template
@@ -86,7 +86,7 @@
   file:
     path: "/mnt/ansible/{{ item.mount[1:]|replace('/', '-') }}"
     state: directory
-  with_items: '{{ disks }}'
+  with_items: '{{ disks | selectattr("mount", "defined") | list }}'
   when: disks is defined
 
 - name: mount root filesystem
@@ -99,26 +99,26 @@
 
 - name: add disks to fstab
   shell: "echo '{% set letters='cdefghijklmnopqrstuvwxyz' %}/dev/sd{{ letters[item.0] }}  {{ item.1.mount }}  ext4 defaults          0 2' >> /mnt/ansible/root/etc/fstab"
-  with_indexed_items: '{{ disks }}'
+  with_indexed_items: '{{ disks | selectattr("mount", "defined") | list }}'
   when: disks is defined
 
 - name: make disk filesystems
   command: "mkfs.ext4 /dev/{{ item.vg }}/{{ guest_name }}{{ item.mount|replace('/', '-') }}"
-  with_items: '{{ disks }}'
+  with_items: '{{ disks | selectattr("mount", "defined") | list }}'
   when: disks is defined
 
 - name: create mount points in root filesystem
   file:
     path: "/mnt/ansible/root{{ item.mount }}"
     state: directory
-  with_items: '{{ disks }}'
+  with_items: '{{ disks | selectattr("mount", "defined") | list }}'
   when: disks is defined
 
 - name: mount disk filesystems
   command: "mount /dev/{{ item.vg }}/{{ guest_name }}{{ item.mount|replace('/', '-') }} /mnt/ansible/{{ item.mount[1:]|replace('/', '-') }}"
   args:
     warn: false
-  with_items: '{{ disks }}'
+  with_items: '{{ disks | selectattr("mount", "defined") | list }}'
   when: disks is defined
 
 - name: move files to separate disks
@@ -126,12 +126,12 @@
   args:
     warn: false
   ignore_errors: yes
-  with_items: '{{ disks }}'
+  with_items: '{{ disks | selectattr("mount", "defined") | list }}'
   when: disks is defined
 
 - name: umount disk filesystems
   command: "umount /dev/{{ item.vg }}/{{ guest_name }}{{ item.mount|replace('/', '-') }}"
-  with_items: '{{ disks|reverse|list }}'
+  with_items: '{{ disks | selectattr("mount", "defined") | list | reverse | list }}'
   when: disks is defined
 
 - name: umount root filesystem
@@ -149,8 +149,9 @@
     --controller=type=scsi,model=virtio-scsi \
     --disk=path=/dev/{{ vg }}/{{ guest_name }}-boot,bus=scsi,cache=none,address.type=drive,address.controller=0,address.bus=0,address.target=0,address.unit=0,boot_order=1 \
     --disk=path=/dev/{{ vg }}/{{ guest_name }}-root,bus=scsi,cache=none,address.type=drive,address.controller=0,address.bus=0,address.target=1,address.unit=1 \
+    {% set letters='cdefghijklmnopqrstuvwxyz' %}
     {% for disk in disks|default([]) %}
-    --disk=path=/dev/{{ disk.vg }}/{{ guest_name }}{{ disk.mount|replace('/', '-') }},bus=scsi,cache=none,address.type=drive,address.controller=0,address.bus=0,address.target={{ loop.index + 1 }},address.unit={{ loop.index + 1 }} \
+    --disk=path=/dev/{{ disk.vg }}/{{ guest_name }}{{ disk.mount|default('/dev/sd' + letters[loop.index - 1])|replace('/', '-') }},bus=scsi,cache=none,address.type=drive,address.controller=0,address.bus=0,address.target={{ loop.index + 1 }},address.unit={{ loop.index + 1 }} \
     {% endfor %}
     --import \
     --os-type=linux \
