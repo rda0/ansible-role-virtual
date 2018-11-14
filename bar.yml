@@ -4,10 +4,16 @@
     - dist: debian9
     - vg: r10
     - guest_name: bar
-    - vcpus: 2
-    - memory: 4096
+    - vcpus: 4
+    - memory: 8192
     - disk_size: 10G
     - bridge: br0
     - mac: 52:54:00:61:56:3e
+    - disks:
+        - mount: /var
+          size: 4G
+          vg: r10
+        - size: 10G
+          vg: r10
   roles:
     - { role: vm-create, tags: vm-create }

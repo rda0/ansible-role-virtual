@@ -1,19 +1,17 @@
 ---
 - hosts: production
   vars:
-    - dist: ubuntu18.04
+    - dist: debian9
     - vg: r10
-    - guest_name: foo
+    - guest_name: phd-test-mon
     - vcpus: 4
-    - memory: 8192
+    - memory: 4096
     - disk_size: 10G
     - bridge: br0
-    - mac: 52:54:00:22:9e:77
+    - mac: 52:54:00:55:a3:9c
     - disks:
         - mount: /var
-          size: 4G
-          vg: r10
-        - size: 10G
+          size: 200G
           vg: r10
   roles:
     - { role: vm-create, tags: vm-create }

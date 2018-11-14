@@ -1,13 +1,13 @@
 ---
 - hosts: production
   vars:
-    - dist: ubuntu18.04
+    - dist: debian9
     - vg: r10
-    - guest_name: phd-test-smb
-    - vcpus: 1
-    - memory: 1024
+    - guest_name: phd-test-aa2
+    - vcpus: 2
+    - memory: 4096
     - disk_size: 10G
     - bridge: br0
-    - mac: 52:54:00:09:6d:78
+    - mac: 52:54:00:0f:f2:fa
   roles:
     - { role: vm-create, tags: vm-create }

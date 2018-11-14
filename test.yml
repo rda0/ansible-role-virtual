@@ -1,0 +1,21 @@
+---
+- hosts: production
+  vars:
+    - disks:
+        - mount: /var
+          size: 2G
+          vg: 1
+        - size: 100G
+          vg: 2
+        - mount: /log
+          size: 1G
+          vg: 3
+  tasks:
+    - name: handle undefined attributes of dicts in list separately based on index
+      debug:
+        msg: "{% set letters='cdefghijklmnopqrstuvwxyz' %}index: {{ item.0 }}, mount: {{ item.1.mount|default('/dev/sd' + letters[item.0]) }}"
+      with_indexed_items: "{{ disks }}"
+    - name: filter list by attributes
+      debug:
+        msg: "{% set letters='cdefghijklmnopqrstuvwxyz' %}index: {{ item.0 }}, mount: {{ item.1.mount }}"
+      with_indexed_items: "{{ disks | selectattr('mount', 'defined') | list }}"
