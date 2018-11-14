@@ -1,0 +1,59 @@
+---
+- name: 'set vm vars for ({{ dist }})'
+  include_vars: "{{ dist }}/vm.yml"
+
+- stat:
+    path: '/dev/{{ vg }}/{{ guest_name }}-root'
+  register: guest_lvm_root
+
+- fail:
+    msg: 'guest root lvm already exists!'
+  when: guest_lvm_root.stat.exists is defined and guest_lvm_root.stat.exists == True
+
+- stat:
+    path: '/etc/libvirt/qemu/{{ guest_name }}.xml'
+  register: guest_xml
+
+- fail:
+    msg: 'guest xml already exists!'
+  when: guest_xml.stat.exists is defined and guest_xml.stat.exists == True
+
+- name: create root lv
+  lvol:
+    vg: '{{ vg }}'
+    lv: '{{ guest_name }}-root'
+    size: "{{ disk_size|default('2G') }}"
+
+- name: launch vm
+  command: |
+    virt-install \
+    --virt-type=kvm \
+    --cpu=host \
+    --name={{ guest_name }} \
+    --vcpus={{ vcpus }} \
+    --memory={{ memory }} \
+    --memorybacking=hugepages=yes \
+    --controller=type=scsi,model=virtio-scsi \
+    --disk=path=/dev/{{ vg }}/{{ guest_name }}-root,bus=scsi,cache=none,address.type=drive,address.controller=0,address.bus=0,address.target=0,address.unit=0,boot_order=1 \
+    --os-type=linux \
+    --os-variant={{ os_variant }} \
+    --console=pty,target_type=serial \
+    --location={{ location }} \
+    --extra-args='auto=true priority=critical console=ttyS0,115200n8 serial' \
+    {% if mac is defined %}
+    --network=bridge={{ bridge }},model=virtio,mac={{ mac }} \
+    {% else %}
+    --network=bridge={{ bridge }},model=virtio \
+    {% endif %}
+    --nographics \
+    --noautoconsole
+
+- name: wait until vm is shut off
+  command: /usr/bin/virsh domstate {{ guest_name }}
+  register: result
+  until: result.stdout.find("shut off") != -1
+  retries: 1000
+  delay: 10
+
+- name: start vm
+  command: /usr/bin/virsh start {{ guest_name }}
