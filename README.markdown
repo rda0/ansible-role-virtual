@@ -53,6 +53,15 @@ This will create the 2 lvs:
 - `/dev/r10/vm-template-stretch-boot`: disk containing grub in MBR and a boot partition
 - `/dev/r10/vm-template-stretch-root`: disk containgin the root filesystem
 
+## On new kvm hosts
+
+Create a playbooks directory for the host incl. the required `vars` symlink:
+
+```sh
+mkdir "playbooks/$(hostname -s)"
+ln -s ../../vars "playbooks/$(hostname -s)/vars"
+```
+
 ## Create a vm
 
 First generate a mac address for the new vm:
