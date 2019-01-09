@@ -11,7 +11,7 @@ virt-install \
 --memorybacking=hugepages=yes \
 --memballoon=virtio \
 --controller=type=scsi,model=virtio-scsi \
---disk=path=/dev/r10/{{ guest_name }}-root,bus=scsi,cache=none \
+--disk=path=/dev/{{ vg }}/{{ guest_name }}-root,bus=scsi,cache=none \
 --location={{ location }} \
 --os-type=linux \
 --os-variant={{ os_variant }} \

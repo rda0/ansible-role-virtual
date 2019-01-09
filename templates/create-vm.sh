@@ -6,7 +6,7 @@ if [ -e /dev/{{ vg }}/{{ guest_name }}-root ]; then
 fi
 
 lvcreate -L {{ disk }} -n {{ guest_name }}-root {{ vg }}
-dd if=/dev/r10/vm-template of=/dev/{{ vg }}/{{ guest_name }}-root bs=1M
+dd if=/dev/{{ vm_template_vg }}/vm-template of=/dev/{{ vg }}/{{ guest_name }}-root bs=1M
 e2fsck -f /dev/{{ vg }}/{{ guest_name }}-root
 resize2fs /dev/{{ vg }}/{{ guest_name }}-root
 
