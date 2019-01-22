@@ -16,6 +16,14 @@
   when: guest_lvm_root.stat.exists is defined and guest_lvm_root.stat.exists == True
 
 - stat:
+    path: '/dev/{{ vg }}/{{ guest_name }}-boot'
+  register: guest_lvm_boot
+
+- fail:
+    msg: 'guest boot lvm already exists!'
+  when: guest_lvm_boot.stat.exists is defined and guest_lvm_boot.stat.exists == True
+
+- stat:
     path: '/etc/libvirt/qemu/{{ guest_name }}.xml'
   register: guest_xml
 
@@ -24,7 +32,7 @@
   when: guest_xml.stat.exists is defined and guest_xml.stat.exists == True
 
 - stat:
-    path: "{% set letters='bcdefghijklmnopqrstuvwxyz' %}/dev/{{ item.1.vg }}/{{ guest_name }}{{ item.1.mount|default('/dev/sd' + letters[item.0])|replace('/', '-') }}"
+    path: "{% set letters='cdefghijklmnopqrstuvwxyz' %}/dev/{{ item.1.vg }}/{{ guest_name }}{{ item.1.mount|default('/dev/sd' + letters[item.0])|replace('/', '-') }}"
   register: guest_lvm_disks
   with_indexed_items: '{{ disks }}'
   when: disks is defined
@@ -34,11 +42,11 @@
   when: disks is defined and item.stat.exists is defined and item.stat.exists == True
   with_items: '{{ guest_lvm_disks.results }}'
 
-- name: create libvirt qemu hook
-  copy:
-    src: qemu
-    dest: /etc/libvirt/hooks/qemu
-    mode: 0755
+- name: create boot lv
+  lvol:
+    vg: '{{ vg }}'
+    lv: '{{ guest_name }}-boot'
+    size: '512M'
 
 - name: create root lv
   lvol:
@@ -49,10 +57,13 @@
 - name: create disk lvs
   lvol:
     vg: '{{ item.1.vg }}'
-    lv: "{% set letters='bcdefghijklmnopqrstuvwxyz' %}{{ guest_name }}{{ item.1.mount|default('/dev/sd' + letters[item.0])|replace('/', '-') }}"
+    lv: "{% set letters='cdefghijklmnopqrstuvwxyz' %}{{ guest_name }}{{ item.1.mount|default('/dev/sd' + letters[item.0])|replace('/', '-') }}"
     size: "{{ item.1.size }}"
   with_indexed_items: '{{ disks }}'
   when: disks is defined
+
+- name: dump boot disk from template
+  command: 'dd if=/dev/{{ vm_template_vg }}/{{ vm_template_name }}-{{ debian_name }}-boot of=/dev/{{ vg }}/{{ guest_name }}-boot bs=1M'
 
 - name: dump root filesystem from template
   command: 'dd if=/dev/{{ vm_template_vg }}/{{ vm_template_name }}-{{ debian_name }}-root of=/dev/{{ vg }}/{{ guest_name }}-root bs=1M'
@@ -87,7 +98,7 @@
   shell: 'echo "{{ guest_name }}" > /mnt/ansible/root/etc/hostname'
 
 - name: add disks to fstab
-  shell: "echo '{% set letters='bcdefghijklmnopqrstuvwxyz' %}/dev/sd{{ letters[item.0] }}  {{ item.1.mount }}  ext4 defaults          0 2' >> /mnt/ansible/root/etc/fstab"
+  shell: "echo '{% set letters='cdefghijklmnopqrstuvwxyz' %}/dev/sd{{ letters[item.0] }}  {{ item.1.mount }}  ext4 defaults          0 2' >> /mnt/ansible/root/etc/fstab"
   with_indexed_items: '{{ disks | selectattr("mount", "defined") | list }}'
   when: disks is defined
 
@@ -136,16 +147,16 @@
     --memory={{ memory }} \
     --memorybacking=hugepages=yes \
     --controller=type=scsi,model=virtio-scsi \
-    --disk=path=/dev/{{ vg }}/{{ guest_name }}-root,bus=scsi,cache=none,address.type=drive,address.controller=0,address.bus=0,address.target=0,address.unit=0,boot_order=1 \
-    {% set letters='bcdefghijklmnopqrstuvwxyz' %}
+    --disk=path=/dev/{{ vg }}/{{ guest_name }}-boot,bus=scsi,cache=none,address.type=drive,address.controller=0,address.bus=0,address.target=0,address.unit=0,boot_order=1 \
+    --disk=path=/dev/{{ vg }}/{{ guest_name }}-root,bus=scsi,cache=none,address.type=drive,address.controller=0,address.bus=0,address.target=1,address.unit=1 \
+    {% set letters='cdefghijklmnopqrstuvwxyz' %}
     {% for disk in disks|default([]) %}
-    --disk=path=/dev/{{ disk.vg }}/{{ guest_name }}{{ disk.mount|default('/dev/sd' + letters[loop.index - 1])|replace('/', '-') }},bus=scsi,cache=none,address.type=drive,address.controller=0,address.bus=0,address.target={{ loop.index }},address.unit={{ loop.index }} \
+    --disk=path=/dev/{{ disk.vg }}/{{ guest_name }}{{ disk.mount|default('/dev/sd' + letters[loop.index - 1])|replace('/', '-') }},bus=scsi,cache=none,address.type=drive,address.controller=0,address.bus=0,address.target={{ loop.index + 1 }},address.unit={{ loop.index + 1 }} \
     {% endfor %}
     --import \
     --os-type=linux \
     --os-variant={{ os_variant }} \
     --console=pty,target_type=serial \
-    --boot=kernel={{ kernel_path }}/{{ guest_name }}/vmlinuz,initrd={{ kernel_path }}/{{ guest_name }}/initrd.img,kernel_args="root=/dev/sda ro nousb console=tty0,115200 console=ttyS0,115200 elevator=noop" \
     {% if mac is defined %}
     --network=bridge={{ bridge }},model=virtio,mac={{ mac }} \
     {% else %}

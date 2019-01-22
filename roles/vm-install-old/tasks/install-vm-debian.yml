@@ -1,9 +1,9 @@
-- name: create vm dir
+- name: create vm path
   file: path={{ item }} state=directory owner=root group=root mode=0700
   with_items:
     - "{{ vm_path }}/{{ guest_name }}"
 
-- name: create vm dir
+- name: create web path
   file: path={{ item }} state=directory owner=root group=root mode=0755
   with_items:
     - "{{ web_path }}/{{ guest_name }}"

@@ -1,0 +1,64 @@
+#!/usr/bin/python3
+
+import os
+import sys
+import errno
+from xml.etree import ElementTree
+from subprocess import Popen, PIPE
+
+KERNEL_PATH = '/var/kvm/kernel'
+VIRT_GET_KERNEL = '/usr/bin/virt-get-kernel'
+
+def main():
+    if len(sys.argv) != 5:
+        sys.exit(0)
+
+    script, domain, operation, sub_operation, extra_args = sys.argv
+    config = sys.stdin.read()
+
+    if not domain or domain == '-':
+        sys.exit(0)
+    if operation != 'prepare' or sub_operation != 'begin':
+        sys.exit(0)
+    
+    try:
+        root = ElementTree.fromstring(config)
+        if root.tag != 'domain':
+            sys.exit(0)
+        if root.attrib['type'] != 'kvm':
+            sys.exit(0)
+        kernel = root.findall('./os/kernel')[0].text
+        initrd = root.findall('./os/initrd')[0].text
+        disk = root.findall('./devices/disk/source')[0].attrib['dev']
+    except (AttributeError, TypeError, IndexError):
+        sys.exit(0)
+    
+    if not (kernel.startswith(KERNEL_PATH) and initrd.startswith(KERNEL_PATH)):
+        sys.exit(0)
+
+    domain_kernel_path = ''.join([KERNEL_PATH, '/', domain])
+
+    try:
+        os.makedirs(domain_kernel_path)
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            raise
+
+    command = [
+        VIRT_GET_KERNEL,
+        '--unversioned-names',
+        '--add', disk,
+        '--output', domain_kernel_path
+    ]
+
+    process = Popen(command, stdout=PIPE, stderr=PIPE)
+    rc = process.wait()
+
+    if rc != 0:
+        stdout, stderr = process.communicate()
+        print(stdout.decode('utf-8'))
+        sys.stderr.write(stderr.decode('utf-8'))
+        sys.exit(1)
+
+if __name__ == '__main__':
+    main()
