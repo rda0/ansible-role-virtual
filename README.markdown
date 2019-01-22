@@ -6,8 +6,9 @@ Install virtual machines using `kvm` and `ansible`
 
 ## Roles (installation methods)
 
-- `vm-create`: creates a vm from 2 template lvms `boot` and `root` (preferred method for production)
-- `vm-create-host-boot`: creates a vm from a template lvm `root` and boots the host kernel
+- `vm-create`: creates a vm from a template lvm `root` (bootloader: extlinux) **preferred method for production**
+- `vm-create-host-boot`: creates a vm from a template lvm `root` and boots using host boot method (kernel extracted from vm fs)
+- `vm-create-part-boot`: creates a vm from 2 template lvms `boot` and `root` (bootloader: grub)
 - `vm-install`: install a vm using the installer and preseed file
 - `vm-install-manual`: install a vm using manual installation via console
 
@@ -16,9 +17,10 @@ Install virtual machines using `kvm` and `ansible`
 This bootstraps a minimal system to lvms to be used as template disks for vms (required for roles `vm-create*`)
 
 ```
-Usage: scripts/bootstrap vm vg dist release [options]
+Usage: scripts/bootstrap/bootstrap vm vg dist release [options]
 
     Bootstraps a bootable kvm vm to lvm filesystem.
+    Default bootloader: extlinux
 
 Options:
 
@@ -27,31 +29,47 @@ Options:
     vg
         Volume group name
     dist
-        Distribution name (debian, ubuntu)
+        Distribution name (example: `debian`, `ubuntu`)
     release
-        Release name (stable, stretch, etc)
-    vg
-        Volume group name
-    -b, --boot
-        Size of boot disk lv (512M)
-    -r, --root
-        Size of root fs lv (2G)
+        Release name (example `stable`, `stretch`, etc)
+    -r, --root <size>
+        Size of root fs lv (default: `2G`)
+    -b, --boot <size>
+        Enable boot disk (and grub), size of boot disk lv (example: `512M`)
+    -i, --package-install <package_list>
+        List of extra packages to install (default: bootstrap-packages/<dist>/<release>/install)
+    -u, --package-purge <package_list>
+        List of packages to purge (default: bootstrap-packages/<dist>/<release>/purge)
+    -n, --network-interface <interface_name>
+        Network interface name (default: `ens2`)
     -h, --help
         Print this help message
 ```
 
-Where `vm` is the base name of the lv to be created. The preferred naming sheme is: `vm-template-<dist_codename>`.
+Where `vm` is the base name of the lv to be created. The preferred naming sheme is: `vm-tpl-<dist_codename>`.
+
+### Bootstrap a template for role `vm-create`
 
 For example Debian 9 Stretch bootstrap:
 
 ```
-scripts/bootstrap vm-template-stretch r10 debian stretch
+scripts/bootstrap/bootstrap vm-tpl-stretch r10 debian stretch
+```
+
+This will create the lv:
+
+- `/dev/r10/vm-tpl-stretch-root`: disk containing the root filesystem (bootloader: extlinux)
+
+### Bootstrap a template for role `vm-create-part-boot`
+
+```
+scripts/bootstrap/bootstrap vm-tpl-part-boot-stretch r10 debian stretch -b 512M
 ```
 
 This will create the 2 lvs:
 
-- `/dev/r10/vm-template-stretch-boot`: disk containing grub in MBR and a boot partition
-- `/dev/r10/vm-template-stretch-root`: disk containgin the root filesystem
+- `/dev/r10/vm-tpl-part-boot-stretch-boot`: disk containing a boot partition with an MBR (bootloader: grub)
+- `/dev/r10/vm-tpl-part-boot-stretch-root`: disk containing the root filesystem
 
 ## On new kvm hosts
 
@@ -76,7 +94,7 @@ Make sure the mac address is properly configured in your network.
 To create a new vm named `foo`, start from the template playbook and copy it tho the kvm hosts playbook directory:
 
 ```sh
-cp playbooks/new-vm-template.yml "playbooks/$(hostname -s)/foo.yml"
+cp playbooks/templates/vm-create.yml "playbooks/$(hostname -s)/foo.yml"
 ```
 
 Edit the playbooks variables `guest_name`, `mac` and any other variables you would like to change (in this example the additional disks are removed):
@@ -87,6 +105,7 @@ Edit the playbooks variables `guest_name`, `mac` and any other variables you wou
   vars:
     - dist: debian9
     - vm_template_vg: r10
+    - vm_template_name: vm-tpl
     - vg: r10
     - guest_name: foo
     - vcpus: 4
@@ -98,7 +117,9 @@ Edit the playbooks variables `guest_name`, `mac` and any other variables you wou
     - { role: vm-create, tags: vm-create }
 ```
 
-Create the vm:
+In this example the whole extra disks `disks` key was removed to not create any additional mount points or empty disks.
+
+Finally create the vm:
 
 ```sh
 ansible-playbook playbooks/<hostname>/foo.yml
