@@ -46,7 +46,7 @@ Options:
         Print this help message
 ```
 
-Where `vm` is the base name of the lv to be created. The preferred naming sheme is: `vm-tpl-<dist_codename>`.
+Where `vm` is the base name of the lv to be created. The preferred naming scheme is: `vm-tpl-<dist_codename>`.
 
 ### Bootstrap a template for role `vm-create`
 
@@ -91,7 +91,7 @@ scripts/macgen
 
 Make sure the mac address is properly configured in your network.
 
-To create a new vm named `foo`, start from the template playbook and copy it tho the kvm hosts playbook directory:
+To create a new vm named `foo`, start from the template playbook and copy it to the kvm hosts playbook directory:
 
 ```sh
 cp playbooks/templates/vm-create.yml "playbooks/$(hostname -s)/foo.yml"
@@ -123,4 +123,34 @@ Finally create the vm:
 
 ```sh
 ansible-playbook playbooks/<hostname>/foo.yml
+```
+
+## bootstrap script
+
+### create package lists
+
+To bootstrap a system using standard packages, you can create 3 files corresponding to the apt package priorities. Run the following `aptitude` commands on a running system with the target release to generate the list of packages:
+
+```
+aptitude search --display-format "%p" '~prequired' > required
+aptitude search --display-format "%p" '~pimportant' > important
+aptitude search --display-format "%p" '~pstandard' > standard
+```
+
+Place the files in the following location:
+
+```
+scripts/bootstrap/packages/<dist>/<release>/
+```
+
+To install some extra packages, write a list of packages in:
+
+```
+scripts/bootstrap/packages/<dist>/<release>/install
+```
+
+To purge some unwanted packages, write a list of packages in:
+
+```
+scripts/bootstrap/packages/<dist>/<release>/purge
 ```
