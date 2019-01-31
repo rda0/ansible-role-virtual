@@ -25,7 +25,7 @@ virt-install \
 --os-type=linux \
 --os-variant={{ os_variant }} \
 --console=pty,target_type=serial \
---boot=kernel=/vmlinuz,initrd=/initrd.img,kernel_args="root=/dev/sda elevator=noop nousb console=ttyS0,115200n8 serial" \
+--boot=kernel=/vmlinuz,initrd=/initrd.img,kernel_args="root=/dev/sda elevator=noop net.ifnames=0 biosdevname=0 nousb console=tty0 console=ttyS0,115200 serial" \
 {% if mac is defined %}
 --network=bridge={{ bridge }},model=virtio,mac={{ mac }} \
 {% else %}

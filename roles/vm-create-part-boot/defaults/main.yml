@@ -1,0 +1,9 @@
+---
+vm_template_vg: vg0
+vm_template_name: vm-tpl
+vg: vg0
+vcpus: 1
+memory: 1024
+disk_size: 2G
+fs: ext4
+bridge: br0

@@ -17,8 +17,8 @@ virt-install \
 --os-variant={{ os_variant }} \
 --console=pty,target_type=serial \
 --initrd-inject={{ vm_path }}/{{ guest_name }}/preseed.cfg \
---extra-args='auto=true priority=critical console=ttyS0,115200n8 serial elevator=noop' \
---boot=kernel_args="elevator=noop" \
+--extra-args='auto=true priority=critical elevator=noop net.ifnames=0 biosdevname=0 nousb console=tty0 console=ttyS0,115200' \
+--boot=kernel_args="elevator=noop net.ifnames=0 biosdevname=0 nousb console=tty0 console=ttyS0,115200" \
 {% if mac is defined %}
 --network=bridge={{ bridge }},model=virtio,mac={{ mac }} \
 {% else %}
