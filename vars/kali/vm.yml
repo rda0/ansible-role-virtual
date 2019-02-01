@@ -1,7 +1,0 @@
----
-template_type: kali
-dist_name: kali
-os_variant: generic
-debian_name: kali-rolling
-arch: amd64
-location: http://http.kali.org/dists/{{ debian_name }}/main/installer-{{ arch }}/

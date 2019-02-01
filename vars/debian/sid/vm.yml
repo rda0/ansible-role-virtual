@@ -1,0 +1,8 @@
+---
+template_type: debian
+version: unstable
+os_variant: generic
+arch: amd64
+initrd_inject: preseed.cfg
+location: http://debian.ethz.ch/debian/dists/{{ codename }}/main/installer-{{ arch }}/
+#location: https://d-i.debian.org/daily-images/{{ arch }}/

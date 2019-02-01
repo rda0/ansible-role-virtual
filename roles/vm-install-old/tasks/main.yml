@@ -1,8 +1,8 @@
-- name: set vm vars for ({{ dist }})
-  include_vars: "{{ dist }}/vm.yml"
+- name: set vm vars for ({{ distribution }}/{{ codename }})
+  include_vars: "{{ distribution }}/{{ codename }}/vm.yml"
 
-- name: set preseed vars for ({{ dist }})
-  include_vars: "{{ dist }}/preseed.yml"
+- name: set preseed vars for ({{ distribution }}/{{ codename }})
+  include_vars: "{{ distribution }}/{{ codename }}/preseed.yml"
 
 - name: display all environment variables
   debug:
