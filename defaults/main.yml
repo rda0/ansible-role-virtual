@@ -1,4 +1,5 @@
----
+import_virtual_bootstrap: True
+
 vm_template_vg: vg0
 vm_template_name: vm-tpl
 vg: vg0

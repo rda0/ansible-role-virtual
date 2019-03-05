@@ -1,0 +1,3 @@
+- import_tasks: '{{ virtual_hypervisor_type }}/{{ virtual_bootstrap_method }}.yml'
+  tags: virtual_bootstrap
+  when: import_virtual_bootstrap
