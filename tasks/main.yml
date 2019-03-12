@@ -3,6 +3,8 @@
     - name: include '{{ virtual_hypervisor_type }}/{{ virtual_bootstrap_method }}.yml'
       include_tasks: '{{ virtual_hypervisor_type }}/{{ virtual_bootstrap_method }}.yml'
       tags: virtual_bootstrap
+      apply:
+        delegate_to: '{{ virtual_hypervisor_host }}'
       when: include_virtual_bootstrap
 
   tags: virtual
