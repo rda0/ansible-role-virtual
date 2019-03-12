@@ -10,12 +10,6 @@
   when: disks is defined and item.stat.exists is defined and item.stat.exists == True
   with_items: '{{ guest_lvm_disks.results }}'
 
-- name: create libvirt qemu hook
-  copy:
-    src: qemu
-    dest: /etc/libvirt/hooks/qemu
-    mode: 0755
-
 - name: create root lv
   lvol:
     vg: '{{ vg }}'
@@ -68,7 +62,7 @@
   when: disks is defined
 
 - name: make disk filesystems
-  command: "mkfs.{{ (item.1.fs|default(fs)) }} /dev/{{ (item.vg|default(vg)) }}/{{ guest_name }}{{ item.mount|replace('/', '-') }}"
+  command: "mkfs.{{ (item.fs|default(fs)) }} /dev/{{ (item.vg|default(vg)) }}/{{ guest_name }}{{ item.mount|replace('/', '-') }}"
   with_items: '{{ disks | selectattr("mount", "defined") | list }}'
   when: disks is defined
 
@@ -121,7 +115,6 @@
     --os-type=linux \
     --os-variant={{ os_variant }} \
     --console=pty,target_type=serial \
-    --boot=kernel={{ kernel_path }}/{{ guest_name }}/vmlinuz,initrd={{ kernel_path }}/{{ guest_name }}/initrd.img,kernel_args="root=/dev/sda ro elevator=noop net.ifnames=0 biosdevname=0 nousb console=tty0 console=ttyS0,115200" \
     {% if mac is defined %}
     --network=bridge={{ bridge }},model=virtio,mac={{ mac }} \
     {% else %}

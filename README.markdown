@@ -4,9 +4,29 @@
 
 Ansible role to install virtual machines on a `kvm` hypervisor.
 
+## Playbook
+
+When including this role, disable facts gathering in the playbook:
+
+```yaml
+- hosts: my_host
+  gather_facts: no
+  roles:
+    - virtual
+    - other_roles
+```
+
+This role (`virtual`) will gather facts just after the virtual host becomes ready, so the facts are available for any following roles.
+
+The playbook needs to be started with `host_key_checking=False` until there is a better solution in ansible:
+
+```sh
+ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook ...
+```
+
 ## Bootstrap methods
 
-- `create`: creates a vm from a template lvm `root` (bootloader: extlinux) **preferred method for production**
+- `create-fs-boot`: creates a vm from a template lvm `root` (bootloader: extlinux) **preferred method for production**
 - `create-host-boot`: creates a vm from a template lvm `root` and boots using host boot method (kernel extracted from vm fs)
 - `create-part-boot`: creates a vm from 2 template lvms `boot` and `root` (bootloader: grub)
 - `install`: install a vm using the installer and preseed file
