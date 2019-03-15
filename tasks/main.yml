@@ -16,4 +16,10 @@
     - name: gather facts
       setup:
 
+    - name: remove haveged
+      package:
+        name: haveged
+        state: absent
+        purge: yes
+
   tags: virtual
