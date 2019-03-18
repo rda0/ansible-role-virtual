@@ -8,6 +8,7 @@
           when: include_virtual_bootstrap
 
       delegate_to: '{{ virtual_hypervisor_host }}'
+      when: virtual_hypervisor_type is defined
 
     - name: wait for virtual system to become ready
       wait_for_connection:
