@@ -1,7 +1,7 @@
 include_virtual_bootstrap: True
 
-virtual_vm_template_vg: vg0
-virtual_vm_template_name: vm-tpl
+virtual_template_vg: vg0
+virtual_template_name: vm-tpl
 virtual_cpus: 1
 virtual_memory: 1024
 virtual_disk_size: 2G

@@ -53,8 +53,8 @@ The following variables are the defaults used in the roles:
 
 ```yml
 ---
-virtual_vm_template_vg: vg0
-virtual_vm_template_name: vm-tpl
+virtual_template_vg: vg0
+virtual_template_name: vm-tpl
 virtual_cpus: 1
 virtual_memory: 1024
 virtual_disk_size: 2G
@@ -76,8 +76,8 @@ Edit the playbooks variables `virtual_guest_name`, `virtual_mac` and any other v
     - virtual_boot_method: fs-boot
     - virtual_distribution: debian
     - virtual_codename: stretch
-    - virtual_vm_template_vg: r10
-    - virtual_vm_template_name: vm-tpl
+    - virtual_template_vg: r10
+    - virtual_template_name: vm-tpl
     - virtual_guest_name: foo
     - virtual_cpus: 4
     - virtual_memory: 4096
@@ -91,8 +91,8 @@ Edit the playbooks variables `virtual_guest_name`, `virtual_mac` and any other v
 
 while:
 
-- `virtual_vm_template_vg`: the vg where to find the vm template filesystem
-- `virtual_vm_template_name`: the lv prefix for the template, the template used will be `/dev/<virtual_vm_template_vg>/<virtual_vm_template_name>-<virtual_codename>`
+- `virtual_template_vg`: the vg where to find the vm template filesystem
+- `virtual_template_name`: the lv prefix for the template, the template used will be `/dev/<virtual_template_vg>/<virtual_template_name>-<virtual_codename>`
 - `virtual_guest_name`: the `<hostname>`
 - `virtual_disk_size`: is the size of the root lv (min `2G`, the default)
 - `virtual_disk_vg`: is the volume group where `<hostname>-root` (and `<hostname>-boot` in role `vm-create-part-boot`) lvs will be created
@@ -119,8 +119,8 @@ To create additional lvs to be used as mount points, use the `virtual_disks` dic
     - virtual_boot_method: fs-boot
     - virtual_distribution: debian
     - virtual_codename: jessie
-    - virtual_vm_template_vg: vg0
-    - virtual_vm_template_name: vm-tpl
+    - virtual_template_vg: vg0
+    - virtual_template_name: vm-tpl
     - virtual_guest_name:
     - virtual_cpus: 2
     - virtual_memory: 2048
