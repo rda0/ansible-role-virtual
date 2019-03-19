@@ -1,13 +1,13 @@
 ---
 - stat:
-    path: "{% set letters='bcdefghijklmnopqrstuvwxyz' %}/dev/{{ (item.1.vg|default(vg)) }}/{{ guest_name }}{{ item.1.mount|default('/dev/sd' + letters[item.0])|replace('/', '-') }}"
+    path: "{% set letters='bcdefghijklmnopqrstuvwxyz' %}/dev/{{ (item.1.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.1.mount|default('/dev/sd' + letters[item.0])|replace('/', '-') }}"
   register: guest_lvm_disks
-  with_indexed_items: '{{ disks }}'
-  when: disks is defined
+  with_indexed_items: '{{ virtual_disks }}'
+  when: virtual_disks is defined
 
 - fail:
     msg: 'guest lvm already exists: {{ item.invocation.module_args.path }}'
-  when: disks is defined and item.stat.exists is defined and item.stat.exists == True
+  when: virtual_disks is defined and item.stat.exists is defined and item.stat.exists == True
   with_items: '{{ guest_lvm_disks.results }}'
 
 - name: create libvirt qemu hook
@@ -18,29 +18,29 @@
 
 - name: create root lv
   lvol:
-    vg: '{{ vg }}'
-    lv: '{{ guest_name }}-root'
-    size: "{{ disk_size|default('2G') }}"
+    vg: '{{ virtual_disk_vg }}'
+    lv: '{{ virtual_guest_name }}-root'
+    size: "{{ virtual_disk_size|default('2G') }}"
 
 - name: create disk lvs
   lvol:
-    vg: '{{ (item.1.vg|default(vg)) }}'
-    lv: "{% set letters='bcdefghijklmnopqrstuvwxyz' %}{{ guest_name }}{{ item.1.mount|default('/dev/sd' + letters[item.0])|replace('/', '-') }}"
+    vg: '{{ (item.1.vg|default(virtual_disk_vg)) }}'
+    lv: "{% set letters='bcdefghijklmnopqrstuvwxyz' %}{{ virtual_guest_name }}{{ item.1.mount|default('/dev/sd' + letters[item.0])|replace('/', '-') }}"
     size: "{{ item.1.size }}"
-  with_indexed_items: '{{ disks }}'
-  when: disks is defined
+  with_indexed_items: '{{ virtual_disks }}'
+  when: virtual_disks is defined
 
 - name: dump root filesystem from template
-  command: 'dd if=/dev/{{ vm_template_vg }}/{{ vm_template_name }}-{{ codename }}-root of=/dev/{{ vg }}/{{ guest_name }}-root bs=1M'
+  command: 'dd if=/dev/{{ virtual_vm_template_vg }}/{{ virtual_vm_template_name }}-{{ virtual_codename }}-root of=/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root bs=1M'
 
 - name: check root filesystem
-  command: 'e2fsck -pf /dev/{{ vg }}/{{ guest_name }}-root'
+  command: 'e2fsck -pf /dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root'
 
 - name: change root filesystem uuid
-  shell: 'echo y | tune2fs /dev/{{ vg }}/{{ guest_name }}-root -U random'
+  shell: 'echo y | tune2fs /dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root -U random'
 
 - name: resize root filesystem
-  command: 'resize2fs /dev/{{ vg }}/{{ guest_name }}-root'
+  command: 'resize2fs /dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root'
 
 - name: create root mount dir
   file:
@@ -51,81 +51,81 @@
   file:
     path: "/mnt/ansible/{{ item.mount[1:]|replace('/', '-') }}"
     state: directory
-  with_items: '{{ disks | selectattr("mount", "defined") | list }}'
-  when: disks is defined
+  with_items: '{{ virtual_disks | selectattr("mount", "defined") | list }}'
+  when: virtual_disks is defined
 
 - name: mount root filesystem
-  command: 'mount /dev/{{ vg }}/{{ guest_name }}-root /mnt/ansible/root'
+  command: 'mount /dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root /mnt/ansible/root'
   args:
     warn: false
 
 - name: set hostname
-  shell: 'echo "{{ guest_name }}" > /mnt/ansible/root/etc/hostname'
+  shell: 'echo "{{ virtual_guest_name }}" > /mnt/ansible/root/etc/hostname'
 
 - name: add disks to fstab
-  shell: "echo '{% set letters='bcdefghijklmnopqrstuvwxyz' %}/dev/sd{{ letters[item.0] }}  {{ item.1.mount }}  {{ (item.1.fs|default(fs)) }} defaults          0 2' >> /mnt/ansible/root/etc/fstab"
-  with_indexed_items: '{{ disks | selectattr("mount", "defined") | list }}'
-  when: disks is defined
+  shell: "echo '{% set letters='bcdefghijklmnopqrstuvwxyz' %}/dev/sd{{ letters[item.0] }}  {{ item.1.mount }}  {{ (item.1.fs|default(virtual_disk_fs)) }} defaults          0 2' >> /mnt/ansible/root/etc/fstab"
+  with_indexed_items: '{{ virtual_disks | selectattr("mount", "defined") | list }}'
+  when: virtual_disks is defined
 
 - name: make disk filesystems
-  command: "mkfs.{{ (item.1.fs|default(fs)) }} /dev/{{ (item.vg|default(vg)) }}/{{ guest_name }}{{ item.mount|replace('/', '-') }}"
-  with_items: '{{ disks | selectattr("mount", "defined") | list }}'
-  when: disks is defined
+  command: "mkfs.{{ (item.1.fs|default(virtual_disk_fs)) }} /dev/{{ (item.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.mount|replace('/', '-') }}"
+  with_items: '{{ virtual_disks | selectattr("mount", "defined") | list }}'
+  when: virtual_disks is defined
 
 - name: create mount points in root filesystem
   file:
     path: "/mnt/ansible/root{{ item.mount }}"
     state: directory
-  with_items: '{{ disks | selectattr("mount", "defined") | list }}'
-  when: disks is defined
+  with_items: '{{ virtual_disks | selectattr("mount", "defined") | list }}'
+  when: virtual_disks is defined
 
 - name: mount disk filesystems
-  command: "mount /dev/{{ (item.vg|default(vg)) }}/{{ guest_name }}{{ item.mount|replace('/', '-') }} /mnt/ansible/{{ item.mount[1:]|replace('/', '-') }}"
+  command: "mount /dev/{{ (item.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.mount|replace('/', '-') }} /mnt/ansible/{{ item.mount[1:]|replace('/', '-') }}"
   args:
     warn: false
-  with_items: '{{ disks | selectattr("mount", "defined") | list }}'
-  when: disks is defined
+  with_items: '{{ virtual_disks | selectattr("mount", "defined") | list }}'
+  when: virtual_disks is defined
 
 - name: move files to separate disks
-  shell: "mv /mnt/ansible/root{{ item.mount }}/* /mnt/ansible/{{ item.mount[1:]|replace('/', '-') }}/; umount /dev/{{ (item.vg|default(vg)) }}/{{ guest_name }}{{ item.mount|replace('/', '-') }}; mount /dev/{{ (item.vg|default(vg)) }}/{{ guest_name }}{{ item.mount|replace('/', '-') }} /mnt/ansible/root{{ item.mount }}"
+  shell: "mv /mnt/ansible/root{{ item.mount }}/* /mnt/ansible/{{ item.mount[1:]|replace('/', '-') }}/; umount /dev/{{ (item.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.mount|replace('/', '-') }}; mount /dev/{{ (item.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.mount|replace('/', '-') }} /mnt/ansible/root{{ item.mount }}"
   args:
     warn: false
   ignore_errors: yes
-  with_items: '{{ disks | selectattr("mount", "defined") | list }}'
-  when: disks is defined
+  with_items: '{{ virtual_disks | selectattr("mount", "defined") | list }}'
+  when: virtual_disks is defined
 
 - name: umount disk filesystems
-  command: "umount /dev/{{ (item.vg|default(vg)) }}/{{ guest_name }}{{ item.mount|replace('/', '-') }}"
-  with_items: '{{ disks | selectattr("mount", "defined") | list | reverse | list }}'
-  when: disks is defined
+  command: "umount /dev/{{ (item.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.mount|replace('/', '-') }}"
+  with_items: '{{ virtual_disks | selectattr("mount", "defined") | list | reverse | list }}'
+  when: virtual_disks is defined
 
 - name: umount root filesystem
-  command: 'umount /dev/{{ vg }}/{{ guest_name }}-root'
+  command: 'umount /dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root'
 
 - name: create vm
   command: |
     virt-install \
     --virt-type=kvm \
     --cpu=host \
-    --name={{ guest_name }} \
-    --vcpus={{ vcpus }} \
-    --memory={{ memory }} \
+    --name={{ virtual_guest_name }} \
+    --vcpus={{ virtual_cpus }} \
+    --memory={{ virtual_memory }} \
     --memorybacking=hugepages=yes \
     --controller=type=scsi,model=virtio-scsi \
-    --disk=path=/dev/{{ vg }}/{{ guest_name }}-root,bus=scsi,cache=none,address.type=drive,address.controller=0,address.bus=0,address.target=0,address.unit=0,boot_order=1 \
+    --disk=path=/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root,bus=scsi,cache=none,address.type=drive,address.controller=0,address.bus=0,address.target=0,address.unit=0,boot_order=1 \
     {% set letters='bcdefghijklmnopqrstuvwxyz' %}
-    {% for disk in disks|default([]) %}
-    --disk=path=/dev/{{ (disk.vg|default(vg)) }}/{{ guest_name }}{{ disk.mount|default('/dev/sd' + letters[loop.index - 1])|replace('/', '-') }},bus=scsi,cache=none,address.type=drive,address.controller=0,address.bus=0,address.target={{ loop.index }},address.unit={{ loop.index }} \
+    {% for disk in virtual_disks|default([]) %}
+    --disk=path=/dev/{{ (disk.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ disk.mount|default('/dev/sd' + letters[loop.index - 1])|replace('/', '-') }},bus=scsi,cache=none,address.type=drive,address.controller=0,address.bus=0,address.target={{ loop.index }},address.unit={{ loop.index }} \
     {% endfor %}
     --import \
     --os-type=linux \
     --os-variant={{ os_variant }} \
     --console=pty,target_type=serial \
-    --boot=kernel={{ kernel_path }}/{{ guest_name }}/vmlinuz,initrd={{ kernel_path }}/{{ guest_name }}/initrd.img,kernel_args="root=/dev/sda ro elevator=noop net.ifnames=0 biosdevname=0 nousb console=tty0 console=ttyS0,115200" \
-    {% if mac is defined %}
-    --network=bridge={{ bridge }},model=virtio,mac={{ mac }} \
+    --boot=kernel={{ kernel_path }}/{{ virtual_guest_name }}/vmlinuz,initrd={{ kernel_path }}/{{ virtual_guest_name }}/initrd.img,kernel_args="root=/dev/sda ro elevator=noop net.ifnames=0 biosdevname=0 nousb console=tty0 console=ttyS0,115200" \
+    {% if virtual_mac is defined %}
+    --network=bridge={{ virtual_bridge }},model=virtio,mac={{ virtual_mac }} \
     {% else %}
-    --network=bridge={{ bridge }},model=virtio \
+    --network=bridge={{ virtual_bridge }},model=virtio \
     {% endif %}
     --nographics \
     --noautoconsole \

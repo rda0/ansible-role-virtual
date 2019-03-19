@@ -1,21 +1,21 @@
 #!/bin/bash
 
-if [ ! -f /etc/libvirt/qemu/{{ guest_name }}.xml ]; then
+if [ ! -f /etc/libvirt/qemu/{{ virtual_guest_name }}.xml ]; then
 
 virt-install \
 --virt-type=kvm \
---name={{ guest_name }} \
---vcpus={{ vcpus }} \
---memory={{ memory }} \
+--name={{ virtual_guest_name }} \
+--vcpus={{ virtual_cpus }} \
+--memory={{ virtual_memory }} \
 --controller type=scsi,model=virtio-scsi \
---disk=/var/lib/libvirt/images/{{ guest_name }}.qcow2,format=qcow2,size={{ disk_size }},bus=scsi,cache=none \
+--disk=/var/lib/libvirt/images/{{ virtual_guest_name }}.qcow2,format=qcow2,size={{ virtual_disk_size }},bus=scsi,cache=none \
 --cdrom={{ location }} \
 --os-type=windows \
 --os-variant={{ os_variant }} \
-{% if mac is defined %}
---network=bridge={{ bridge }},model=e1000,mac={{ mac }} \
+{% if virtual_mac is defined %}
+--network=bridge={{ virtual_bridge }},model=e1000,mac={{ virtual_mac }} \
 {% else %}
---network=bridge={{ bridge }},model=e1000 \
+--network=bridge={{ virtual_bridge }},model=e1000 \
 {% endif %}
 --vnc \
 --accelerate \
@@ -23,12 +23,12 @@ virt-install \
 --keymap=en-us \
 --noautoconsole
 
-# virsh domblklist {{ guest_name }}
-# virsh change-media {{ guest_name }} <target> --eject
-# virsh change-media {{ guest_name }} <target> /opt/iso/windows/virtio-win.iso --insert
+# virsh domblklist {{ virtual_guest_name }}
+# virsh change-media {{ virtual_guest_name }} <target> --eject
+# virsh change-media {{ virtual_guest_name }} <target> /opt/iso/windows/virtio-win.iso --insert
 # load virioscsi driver (2k16/amd64)
-# virsh change-media {{ guest_name }} <target> --eject
-# virsh change-media {{ guest_name }} <target> /opt/iso/windows/win_srv_16.iso --insert
+# virsh change-media {{ virtual_guest_name }} <target> --eject
+# virsh change-media {{ virtual_guest_name }} <target> /opt/iso/windows/win_srv_16.iso --insert
 
 else
     echo "vm already defined!"

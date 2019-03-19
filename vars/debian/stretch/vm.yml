@@ -4,4 +4,4 @@ version: 9
 os_variant: generic
 arch: amd64
 initrd_inject: preseed.cfg
-location: http://debian.ethz.ch/debian/dists/{{ codename }}/main/installer-{{ arch }}/
+location: http://debian.ethz.ch/debian/dists/{{ virtual_codename }}/main/installer-{{ arch }}/

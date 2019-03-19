@@ -1,37 +1,37 @@
 - name: create vm dir
   file: path={{ item }} state=directory owner=root group=root mode=0700
   with_items:
-    - "{{ vm_path }}/{{ guest_name }}"
+    - "{{ vm_path }}/{{ virtual_guest_name }}"
 
 - name: create install-vm.sh
   template:
     src: install-vm-windows.sh
-    dest: "{{ vm_path }}/{{ guest_name }}/install-vm.sh"
+    dest: "{{ vm_path }}/{{ virtual_guest_name }}/install-vm.sh"
     owner: root
     group: root
     mode: 0770
 
 - debug:
     msg:
-      - "run `virt-viewer --connect qemu:///system {{ guest_name }}` to connect via vnc"
+      - "run `virt-viewer --connect qemu:///system {{ virtual_guest_name }}` to connect via vnc"
       - "click your way through the gui, when at the 'load drivers' screen, run:"
-      - "virsh domblklist {{ guest_name }}"
-      - "virsh change-media {{ guest_name }} <target> --eject"
+      - "virsh domblklist {{ virtual_guest_name }}"
+      - "virsh change-media {{ virtual_guest_name }} <target> --eject"
       - "get drivers from: https://fedoraproject.org/wiki/Windows_Virtio_Drivers"
-      - "virsh change-media {{ guest_name }} <target> /opt/iso/windows/virtio-win.iso --insert"
+      - "virsh change-media {{ virtual_guest_name }} <target> /opt/iso/windows/virtio-win.iso --insert"
       - "load driver: virioscsi driver (2k16/amd64)"
-      - "virsh change-media {{ guest_name }} <target> --eject"
-      - "virsh change-media {{ guest_name }} <target> /opt/iso/windows/win_srv_16.iso --insert"
+      - "virsh change-media {{ virtual_guest_name }} <target> --eject"
+      - "virsh change-media {{ virtual_guest_name }} <target> /opt/iso/windows/win_srv_16.iso --insert"
 
 - name: execute install-vm.sh
-  command: "/bin/bash {{ vm_path }}/{{ guest_name }}/install-vm.sh"
+  command: "/bin/bash {{ vm_path }}/{{ virtual_guest_name }}/install-vm.sh"
 
 - name: wait until vm is shut off
-  command: /usr/bin/virsh domstate {{ guest_name }}
+  command: /usr/bin/virsh domstate {{ virtual_guest_name }}
   register: result
   until: result.stdout.find("shut off") != -1
   retries: 1000
   delay: 10
 
 - name: start vm
-  command: /usr/bin/virsh start {{ guest_name }}
+  command: /usr/bin/virsh start {{ virtual_guest_name }}

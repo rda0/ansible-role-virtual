@@ -1,20 +1,20 @@
 ---
-- name: 'set vm vars for ({{ distribution }}/{{ codename }})'
-  include_vars: "{{ distribution }}/{{ codename }}/vm.yml"
+- name: 'set vm vars for ({{ virtual_distribution }}/{{ virtual_codename }})'
+  include_vars: "{{ virtual_distribution }}/{{ virtual_codename }}/vm.yml"
 
-- name: check if '/dev/{{ vg }}/{{ guest_name }}-root' exists
+- name: check if '/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root' exists
   stat:
-    path: '/dev/{{ vg }}/{{ guest_name }}-root'
+    path: '/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root'
   register: guest_lvm_root
 
-- name: check if '/dev/{{ vg }}/{{ guest_name }}-boot' exists
+- name: check if '/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-boot' exists
   stat:
-    path: '/dev/{{ vg }}/{{ guest_name }}-boot'
+    path: '/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-boot'
   register: guest_lvm_boot
 
-- name: check if '/etc/libvirt/qemu/{{ guest_name }}.xml' exists
+- name: check if '/etc/libvirt/qemu/{{ virtual_guest_name }}.xml' exists
   stat:
-    path: '/etc/libvirt/qemu/{{ guest_name }}.xml'
+    path: '/etc/libvirt/qemu/{{ virtual_guest_name }}.xml'
   register: guest_xml
 
 - name: include '{{ virtual_hypervisor_type }}/{{ virtual_bootstrap_method }}-{{ virtual_boot_method }}.yml'

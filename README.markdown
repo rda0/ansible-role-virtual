@@ -9,7 +9,7 @@ Ansible role to install virtual machines on a `kvm` hypervisor.
 When including this role, disable facts gathering in the playbook:
 
 ```yaml
-- hosts: my_host
+- hosts: my-host
   gather_facts: no
   roles:
     - virtual
@@ -53,73 +53,83 @@ The following variables are the defaults used in the roles:
 
 ```yml
 ---
-vm_template_vg: vg0
-vm_template_name: vm-tpl
-vg: vg0
-vcpus: 1
-memory: 1024
-disk_size: 2G
-fs: ext4
-bridge: br0
+virtual_vm_template_vg: vg0
+virtual_vm_template_name: vm-tpl
+virtual_cpus: 1
+virtual_memory: 1024
+virtual_disk_size: 2G
+virtual_disk_vg: vg0
+virtual_disk_fs: ext4
+virtual_bridge: br0
 ```
 
-Edit the playbooks variables `guest_name`, `mac` and any other variables you would like to change (in this example the additional disks are removed):
+Edit the playbooks variables `virtual_guest_name`, `virtual_mac` and any other variables you would like to change (in this example the additional `virtual_disks` are removed):
 
 ```yml
 ---
-- hosts: production
+- hosts: my-host
+  gather_facts: no
   vars:
-    - distribution: debian
-    - codename: stretch
-    - vm_template_vg: r10
-    - vm_template_name: vm-tpl
-    - vg: r10
-    - guest_name: foo
-    - vcpus: 4
-    - memory: 4096
-    - disk_size: 10G
-    - bridge: br0
-    - mac: 52:54:00:7a:3b:8f
+    - virtual_hypervisor_host: my-kvm-hypervisor
+    - virtual_hypervisor_type: kvm
+    - virtual_bootstrap_method: create
+    - virtual_boot_method: fs-boot
+    - virtual_distribution: debian
+    - virtual_codename: stretch
+    - virtual_vm_template_vg: r10
+    - virtual_vm_template_name: vm-tpl
+    - virtual_guest_name: foo
+    - virtual_cpus: 4
+    - virtual_memory: 4096
+    - virtual_disk_size: 10G
+    - virtual_disk_vg: r10
+    - virtual_bridge: br0
+    - virtual_mac: 52:54:00:7a:3b:8f
   roles:
-    - { role: vm-create, tags: vm-create }
+    - virtual
 ```
 
 while:
 
-- `vm_template_vg`: the vg where to find the vm template filesystem
-- `vm_template_name`: the lv prefix for the template, the template used will be `/dev/<vm_template_vg>/<vm_template_name>-<codename>`
-- `vg`: is the volume group where `<hostname>-root` (and `<hostname>-boot` in role `vm-create-part-boot`) lvs will be created
-- `guest_name`: the `<hostname>`
-- `disk_size`: is the size of the root lv (min `2G`, the default)
-- `disks`: is an optional parameter to create lvs for other mount points
-- `fs`: the default filesystem to be used for additional disks with mount points
-- `guest_name`: the geuests name used in libvirt and virsh (example: `virsh start <guest_name>`), use the short hostname
-- `vcpus`: amount of virtual cpus
-- `memory`: memory in MB
-- `bridge`: the bridge interface to be used
-- `mac`: the guests mac address
+- `virtual_vm_template_vg`: the vg where to find the vm template filesystem
+- `virtual_vm_template_name`: the lv prefix for the template, the template used will be `/dev/<virtual_vm_template_vg>/<virtual_vm_template_name>-<virtual_codename>`
+- `virtual_guest_name`: the `<hostname>`
+- `virtual_disk_size`: is the size of the root lv (min `2G`, the default)
+- `virtual_disk_vg`: is the volume group where `<hostname>-root` (and `<hostname>-boot` in role `vm-create-part-boot`) lvs will be created
+- `virtual_disk_fs`: the default filesystem to be used for additional `virtual_disks` with mount points
+- `virtual_disks`: is an optional parameter to create lvs for other mount points
+- `virtual_guest_name`: the geuests name used in libvirt and virsh (example: `virsh start <virtual_guest_name>`), use the short hostname
+- `virtual_cpus`: amount of virtual cpus
+- `virtual_memory`: memory in MB
+- `virtual_bridge`: the bridge interface to be used
+- `virtual_mac`: the guests mac address
 
-In this example the whole extra disks `disks` key was removed to not create any additional mount points or empty disks.
+In this example the whole extra disks `virtual_disks` key was removed to not create any additional mount points or empty disks.
 
-To create additional lvs to be used as mount points, use the `disks` dictionary:
+To create additional lvs to be used as mount points, use the `virtual_disks` dictionary:
 
 ```yml
 ---
-- hosts: production
+- hosts: my-host
+  gather_facts: no
   vars:
-    - distribution: debian
-    - codename: jessie
-    - vm_template_vg: vg0
-    - vm_template_name: vm-tpl
-    - vg: vg0
-    - guest_name:
-    - vcpus: 2
-    - memory: 2048
-    - disk_size: 4G
-    - fs: ext3
-    - bridge: br0
-    - mac: 52:54:00:7a:3b:8f
-    - disks:
+    - virtual_hypervisor_host: my-kvm-hypervisor
+    - virtual_hypervisor_type: kvm
+    - virtual_bootstrap_method: create
+    - virtual_boot_method: fs-boot
+    - virtual_distribution: debian
+    - virtual_codename: jessie
+    - virtual_vm_template_vg: vg0
+    - virtual_vm_template_name: vm-tpl
+    - virtual_guest_name:
+    - virtual_cpus: 2
+    - virtual_memory: 2048
+    - virtual_disk_size: 4G
+    - virtual_disk_vg: vg0
+    - virtual_disk_fs: ext3
+    - virtual_bridge: br0
+    - virtual_mac: 52:54:00:7a:3b:8f
+    - virtual_disks:
         - mount: /var
           size: 2G
         - mount: /var/log
@@ -133,10 +143,10 @@ To create additional lvs to be used as mount points, use the `disks` dictionary:
           fs: xfs
         - size: 10G
   roles:
-    - { role: vm-create, tags: vm-create }
+    - virtual
 ```
 
-The above will create the following disks and mount points (if `disk.vg` or  `disk.fs` is omitted, the value from `vg` or `fs` for the root disk will be used):
+The above will create the following disks and mount points (if `disk.vg` or  `disk.fs` is omitted, the value from `virtual_disk_vg` or `virtual_disk_fs` for the root disk will be used):
 
 ```
 /dev/sda /        ext3   4G vg0

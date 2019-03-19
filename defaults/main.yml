@@ -1,10 +1,10 @@
 include_virtual_bootstrap: True
 
-vm_template_vg: vg0
-vm_template_name: vm-tpl
-vg: vg0
-vcpus: 1
-memory: 1024
-disk_size: 2G
-fs: ext4
-bridge: br0
+virtual_vm_template_vg: vg0
+virtual_vm_template_name: vm-tpl
+virtual_cpus: 1
+virtual_memory: 1024
+virtual_disk_size: 2G
+virtual_disk_vg: vg0
+virtual_disk_fs: ext4
+virtual_bridge: br0

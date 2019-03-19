@@ -1,24 +1,24 @@
 #!/bin/bash
 
-if [ ! -f /etc/libvirt/qemu/{{ guest_name }}.xml ]; then
+if [ ! -f /etc/libvirt/qemu/{{ virtual_guest_name }}.xml ]; then
 
 virt-install \
 --virt-type=kvm \
---name={{ guest_name }} \
---vcpus={{ vcpus }} \
---memory={{ memory }} \
+--name={{ virtual_guest_name }} \
+--vcpus={{ virtual_cpus }} \
+--memory={{ virtual_memory }} \
 --controller type=scsi,model=virtio-scsi \
---disk=/var/lib/libvirt/images/{{ guest_name }}.qcow2,format=qcow2,size={{ disk_size }},bus=scsi,cache=none \
+--disk=/var/lib/libvirt/images/{{ virtual_guest_name }}.qcow2,format=qcow2,size={{ virtual_disk_size }},bus=scsi,cache=none \
 --location={{ location }} \
 --os-type=linux \
 --os-variant={{ os_variant }} \
 --console=pty,target_type=serial \
---initrd-inject={{ vm_path }}/{{ guest_name }}/preseed.cfg \
+--initrd-inject={{ vm_path }}/{{ virtual_guest_name }}/preseed.cfg \
 --extra-args='auto=true priority=critical console=ttyS0,115200n8 serial' \
-{% if mac is defined %}
---network=bridge={{ bridge }},model=virtio,mac={{ mac }} \
+{% if virtual_mac is defined %}
+--network=bridge={{ virtual_bridge }},model=virtio,mac={{ virtual_mac }} \
 {% else %}
---network=bridge={{ bridge }},model=virtio \
+--network=bridge={{ virtual_bridge }},model=virtio \
 {% endif %}
 --nographics \
 --noautoconsole

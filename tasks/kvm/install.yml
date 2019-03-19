@@ -1,35 +1,35 @@
 ---
-- name: set vm vars for ({{ distribution }}/{{ codename }})
-  include_vars: "{{ distribution }}/{{ codename }}/vm.yml"
+- name: set vm vars for ({{ virtual_distribution }}/{{ virtual_codename }})
+  include_vars: "{{ virtual_distribution }}/{{ virtual_codename }}/vm.yml"
 
-- name: set preseed vars for ({{ distribution }}/{{ codename }})
-  include_vars: "{{ distribution }}/{{ codename }}/preseed.yml"
+- name: set preseed vars for ({{ virtual_distribution }}/{{ virtual_codename }})
+  include_vars: "{{ virtual_distribution }}/{{ virtual_codename }}/preseed.yml"
 
 - name: create vm dir
   file: path={{ item }} state=directory owner=root group=root mode=0700
   with_items:
-    - "{{ vm_path }}/{{ guest_name }}"
+    - "{{ vm_path }}/{{ virtual_guest_name }}"
 
 - name: create vm web dir
   file: path={{ item }} state=directory owner=root group=root mode=0755
   with_items:
-    - "{{ web_path }}/{{ guest_name }}"
+    - "{{ web_path }}/{{ virtual_guest_name }}"
 
 - name: create preseed.cfg
   template:
     src: "{{ template_type }}/preseed-nolvm.cfg"
-    dest: "{{ vm_path }}/{{ guest_name }}/{{ initrd_inject }}"
+    dest: "{{ vm_path }}/{{ virtual_guest_name }}/{{ initrd_inject }}"
 
 - name: create post-install.sh
   template:
     src: "{{ template_type }}/post-install.sh"
-    dest: "{{ web_path }}/{{ guest_name }}/post-install.sh"
+    dest: "{{ web_path }}/{{ virtual_guest_name }}/post-install.sh"
     owner: root
     group: root
     mode: 0644
 
 - stat:
-    path: '/dev/{{ vg }}/{{ guest_name }}-root'
+    path: '/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root'
   register: guest_lvm_root
 
 - fail:
@@ -37,7 +37,7 @@
   when: guest_lvm_root.stat.exists is defined and guest_lvm_root.stat.exists == True
 
 - stat:
-    path: '/etc/libvirt/qemu/{{ guest_name }}.xml'
+    path: '/etc/libvirt/qemu/{{ virtual_guest_name }}.xml'
   register: guest_xml
 
 - fail:
@@ -46,42 +46,42 @@
 
 - name: create lv
   lvol:
-    vg: '{{ vg }}'
-    lv: '{{ guest_name }}-root'
-    size: '{{ disk_size }}'
+    vg: '{{ virtual_disk_vg }}'
+    lv: '{{ virtual_guest_name }}-root'
+    size: '{{ virtual_disk_size }}'
 
 - name: install vm
   command: |
     virt-install \
     --virt-type=kvm \
     --cpu=host \
-    --name={{ guest_name }} \
-    --vcpus={{ vcpus }} \
-    --memory={{ memory }} \
+    --name={{ virtual_guest_name }} \
+    --vcpus={{ virtual_cpus }} \
+    --memory={{ virtual_memory }} \
     --memorybacking=hugepages=yes \
     --controller=type=scsi,model=virtio-scsi \
-    --disk=path=/dev/{{ vg }}/{{ guest_name }}-root,bus=scsi,cache=none,address.type=drive,address.controller=0,address.bus=0,address.target=0,address.unit=0 \
+    --disk=path=/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root,bus=scsi,cache=none,address.type=drive,address.controller=0,address.bus=0,address.target=0,address.unit=0 \
     --location={{ location }} \
     --os-type=linux \
     --os-variant={{ os_variant }} \
     --console=pty,target_type=serial \
-    --initrd-inject={{ vm_path }}/{{ guest_name }}/preseed.cfg \
+    --initrd-inject={{ vm_path }}/{{ virtual_guest_name }}/preseed.cfg \
     --extra-args='auto=true priority=critical elevator=noop net.ifnames=0 biosdevname=0 nousb console=tty0 console=ttyS0,115200' \
-    {% if mac is defined %}
-    --network=bridge={{ bridge }},model=virtio,mac={{ mac }} \
+    {% if virtual_mac is defined %}
+    --network=bridge={{ virtual_bridge }},model=virtio,mac={{ virtual_mac }} \
     {% else %}
-    --network=bridge={{ bridge }},model=virtio \
+    --network=bridge={{ virtual_bridge }},model=virtio \
     {% endif %}
     --nographics \
     --noautoconsole \
     --autostart
 
 - name: wait until vm is shut off
-  command: /usr/bin/virsh domstate {{ guest_name }}
+  command: /usr/bin/virsh domstate {{ virtual_guest_name }}
   register: result
   until: result.stdout.find("shut off") != -1
   retries: 1000
   delay: 10
 
 - name: start vm
-  command: /usr/bin/virsh start {{ guest_name }}
+  command: /usr/bin/virsh start {{ virtual_guest_name }}
