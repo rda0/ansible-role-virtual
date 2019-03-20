@@ -16,6 +16,10 @@
     dest: /etc/libvirt/hooks/qemu
     mode: 0755
 
+- name: set fact mount_path
+  set_fact:
+    mount_path: "/mnt/ansible/{{ virtual_guest_name }}_{{ 1000000 | random | hash('sha1') }}"
+
 - name: create root lv
   lvol:
     vg: '{{ virtual_disk_vg }}'
@@ -44,26 +48,26 @@
 
 - name: create root mount dir
   file:
-    path: /mnt/ansible/root
+    path: '{{ mount_path }}/root'
     state: directory
 
 - name: create disk mount dirs
   file:
-    path: "/mnt/ansible/{{ item.mount[1:]|replace('/', '-') }}"
+    path: "{{ mount_path }}/{{ item.mount[1:]|replace('/', '-') }}"
     state: directory
   with_items: '{{ virtual_disks | selectattr("mount", "defined") | list }}'
   when: virtual_disks is defined
 
 - name: mount root filesystem
-  command: 'mount /dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root /mnt/ansible/root'
+  command: 'mount /dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root {{ mount_path }}/root'
   args:
     warn: false
 
 - name: set hostname
-  shell: 'echo "{{ virtual_guest_name }}" > /mnt/ansible/root/etc/hostname'
+  shell: 'echo "{{ virtual_guest_name }}" > {{ mount_path }}/root/etc/hostname'
 
 - name: add disks to fstab
-  shell: "echo '{% set letters='bcdefghijklmnopqrstuvwxyz' %}/dev/sd{{ letters[item.0] }}  {{ item.1.mount }}  {{ (item.1.fs|default(virtual_disk_fs)) }} defaults          0 2' >> /mnt/ansible/root/etc/fstab"
+  shell: "echo '{% set letters='bcdefghijklmnopqrstuvwxyz' %}/dev/sd{{ letters[item.0] }}  {{ item.1.mount }}  {{ (item.1.fs|default(virtual_disk_fs)) }} defaults          0 2' >> {{ mount_path }}/root/etc/fstab"
   with_indexed_items: '{{ virtual_disks | selectattr("mount", "defined") | list }}'
   when: virtual_disks is defined
 
@@ -74,20 +78,20 @@
 
 - name: create mount points in root filesystem
   file:
-    path: "/mnt/ansible/root{{ item.mount }}"
+    path: "{{ mount_path }}/root{{ item.mount }}"
     state: directory
   with_items: '{{ virtual_disks | selectattr("mount", "defined") | list }}'
   when: virtual_disks is defined
 
 - name: mount disk filesystems
-  command: "mount /dev/{{ (item.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.mount|replace('/', '-') }} /mnt/ansible/{{ item.mount[1:]|replace('/', '-') }}"
+  command: "mount /dev/{{ (item.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.mount|replace('/', '-') }} {{ mount_path }}/{{ item.mount[1:]|replace('/', '-') }}"
   args:
     warn: false
   with_items: '{{ virtual_disks | selectattr("mount", "defined") | list }}'
   when: virtual_disks is defined
 
 - name: move files to separate disks
-  shell: "mv /mnt/ansible/root{{ item.mount }}/* /mnt/ansible/{{ item.mount[1:]|replace('/', '-') }}/; umount /dev/{{ (item.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.mount|replace('/', '-') }}; mount /dev/{{ (item.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.mount|replace('/', '-') }} /mnt/ansible/root{{ item.mount }}"
+  shell: "mv {{ mount_path }}/root{{ item.mount }}/* {{ mount_path }}/{{ item.mount[1:]|replace('/', '-') }}/; umount /dev/{{ (item.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.mount|replace('/', '-') }}; mount /dev/{{ (item.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.mount|replace('/', '-') }} {{ mount_path }}/root{{ item.mount }}"
   args:
     warn: false
   ignore_errors: yes
