@@ -13,7 +13,7 @@ virtual_memory_balloon: False
 virtual_memory_hugepages: True
 virtual_memory_hugepages_size: 2048
 virtual_memory_hugepages_unit: KiB
-virtual_numa_cell_cpus: '0-7'
+virtual_numa_cell_cpus: '0-{{ virtual_cpus_max-1 | int | abs }}'
 virtual_numa_cell_memory: '{{ virtual_memory*1024 | int | abs }}'
 virtual_disk_size: 2G
 virtual_disk_vg: vg0
