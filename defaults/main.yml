@@ -19,5 +19,5 @@ virtual_disk_size: 2G
 virtual_disk_vg: vg0
 virtual_disk_fs: ext4
 virtual_bridge: br0
-virtual_interface_suffix: '-eth0'
+virtual_interface_suffix: ''
 virtual_interface_name: '{{ virtual_guest_name }}{{ virtual_interface_suffix }}'

@@ -51,7 +51,7 @@ cp playbooks/templates/vm-create.yml "playbooks/$(hostname -s)/foo.yml"
 
 The following variables are the defaults used in the roles:
 
-```yml
+```yaml
 ---
 virtual_template_vg: vg0
 virtual_template_name: vm-tpl
@@ -61,11 +61,14 @@ virtual_disk_size: 2G
 virtual_disk_vg: vg0
 virtual_disk_fs: ext4
 virtual_bridge: br0
+virtual_interface_name: '{{ virtual_guest_name }}'
 ```
+
+Maximum `virtual_interface_name` length: 15 characters.
 
 Edit the playbooks variables `virtual_guest_name`, `virtual_mac` and any other variables you would like to change (in this example the additional `virtual_disks` are removed):
 
-```yml
+```yaml
 ---
 - hosts: my-host
   gather_facts: no
@@ -108,7 +111,7 @@ In this example the whole extra disks `virtual_disks` key was removed to not cre
 
 To create additional lvs to be used as mount points, use the `virtual_disks` dictionary:
 
-```yml
+```yaml
 ---
 - hosts: my-host
   gather_facts: no
