@@ -1,26 +1,26 @@
 - block:
 
-    - block:
+  - block:
 
-        - name: include '{{ virtual_hypervisor_type }}/{{ virtual_bootstrap_method }}.yml'
-          include_tasks: '{{ virtual_hypervisor_type }}/{{ virtual_bootstrap_method }}.yml'
-          tags: virtual_bootstrap
-          when: include_virtual_bootstrap
+    - name: include '{{ virtual_hypervisor_type }}/{{ virtual_bootstrap_method }}.yml'
+      include_tasks: '{{ virtual_hypervisor_type }}/{{ virtual_bootstrap_method }}.yml'
+      tags: virtual_bootstrap
+      when: include_virtual_bootstrap
 
-      delegate_to: '{{ virtual_hypervisor_host }}'
-      when: virtual_hypervisor_type is defined
+    delegate_to: '{{ virtual_hypervisor_host }}'
+    when: virtual_hypervisor_type is defined
 
-    - name: wait for virtual system to become ready
-      wait_for_connection:
-        timeout: 900
+  - name: wait for virtual system to become ready
+    wait_for_connection:
+      timeout: 900
 
-    - name: gather facts
-      setup:
+  - name: gather facts
+    setup:
 
-    - name: remove haveged
-      package:
-        name: haveged
-        state: absent
-        purge: yes
+  - name: remove haveged
+    package:
+      name: haveged
+      state: absent
+      purge: yes
 
   tags: virtual
