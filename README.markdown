@@ -1,10 +1,13 @@
-# ansible-role-virtual
+ansible-role-virtual
+====================
 
-## Description
+Description
+-----------
 
-Ansible role to install virtual machines on a `kvm` hypervisor.
+Ansible role to deploy virtual machines on a `kvm` hypervisor.
 
-## Playbook
+Playbook
+--------
 
 When including this role, disable facts gathering in the playbook:
 
@@ -24,7 +27,8 @@ The playbook needs to be started with `host_key_checking=False` until there is a
 ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook ...
 ```
 
-## Bootstrap methods
+Bootstrap methods
+-----------------
 
 - `create-fs-boot`: creates a vm from a template lvm `root` (bootloader: extlinux) **preferred method for production**
 - `create-host-boot`: creates a vm from a template lvm `root` and boots using host boot method (kernel extracted from vm fs)
@@ -32,8 +36,8 @@ ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook ...
 - `install`: install a vm using the installer and preseed file
 - `install-manual`: install a vm using manual installation via console
 
-
-## Create a vm
+Network
+-------
 
 First generate a mac address for the new vm starting with `52:54:00` (kvm), example:
 
@@ -41,35 +45,26 @@ First generate a mac address for the new vm starting with `52:54:00` (kvm), exam
 52:54:00:7a:3b:8f
 ```
 
-Make sure the mac address is properly configured in your network.
+Make sure the mac address is properly configured (DNS, DHCP) in your network.
 
-To create a new vm named `foo`, start from the template playbook and copy it to the kvm hosts playbook directory:
+Role variables
+--------------
 
-```sh
-cp playbooks/templates/vm-create.yml "playbooks/$(hostname -s)/foo.yml"
-```
+See `defaults/main.yml` for all variable defaults.
 
-The following variables are the defaults used in the roles:
+Special variables:
 
-```yaml
----
-virtual_template_vg: vg0
-virtual_template_name: vm-tpl
-virtual_cpus: 1
-virtual_memory: 1024
-virtual_disk_size: 2G
-virtual_disk_vg: vg0
-virtual_disk_fs: ext4
-virtual_bridge: br0
-virtual_interface_name: '{{ virtual_guest_name }}'
-```
+- `virtual_interface_name`: the maximum interface name length is limited to 15 characters
+- `virtual_cpus_max`: if set to a larger value than `virtual_cpus`, cpu hotplugging will be enabled
+- `virtual_memory_max`: if set to a larger value than `virtual_memory`, memory hotplugging will be enabled
+- `virtual_memory_hugepages`: defaults to `True`, make sure enough free hugepages are available on the hypervisor
 
-Maximum `virtual_interface_name` length: 15 characters.
+Examples
+--------
 
 Edit the playbooks variables `virtual_guest_name`, `virtual_mac` and any other variables you would like to change (in this example the additional `virtual_disks` are removed):
 
 ```yaml
----
 - hosts: my-host
   gather_facts: no
   vars:
@@ -81,7 +76,7 @@ Edit the playbooks variables `virtual_guest_name`, `virtual_mac` and any other v
     - virtual_codename: stretch
     - virtual_template_vg: r10
     - virtual_template_name: vm-tpl
-    - virtual_guest_name: foo
+    - virtual_guest_name: my-host
     - virtual_cpus: 4
     - virtual_memory: 4096
     - virtual_disk_size: 10G
@@ -95,7 +90,7 @@ Edit the playbooks variables `virtual_guest_name`, `virtual_mac` and any other v
 while:
 
 - `virtual_template_vg`: the vg where to find the vm template filesystem
-- `virtual_template_name`: the lv prefix for the template, the template used will be `/dev/<virtual_template_vg>/<virtual_template_name>-<virtual_codename>`
+- `virtual_template_name`: the lv prefix for the template, the template used will be `/dev/<virtual_template_vg>/<virtual_template_name>-<virtual_codename>-<mount_point>`
 - `virtual_guest_name`: the `<hostname>`
 - `virtual_disk_size`: is the size of the root lv (min `2G`, the default)
 - `virtual_disk_vg`: is the volume group where `<hostname>-root` (and `<hostname>-boot` in role `vm-create-part-boot`) lvs will be created
@@ -112,7 +107,6 @@ In this example the whole extra disks `virtual_disks` key was removed to not cre
 To create additional lvs to be used as mount points, use the `virtual_disks` dictionary:
 
 ```yaml
----
 - hosts: my-host
   gather_facts: no
   vars:
@@ -124,7 +118,7 @@ To create additional lvs to be used as mount points, use the `virtual_disks` dic
     - virtual_codename: jessie
     - virtual_template_vg: vg0
     - virtual_template_name: vm-tpl
-    - virtual_guest_name:
+    - virtual_guest_name: my-host
     - virtual_cpus: 2
     - virtual_memory: 2048
     - virtual_disk_size: 4G
@@ -158,10 +152,4 @@ The above will create the following disks and mount points (if `disk.vg` or  `di
 /dev/sdd /export  ext3 100G vg1-data
 /dev/sde /scratch xfs   20G vg1-data
 /dev/sdf                10G vg0
-```
-
-Finally create the vm:
-
-```sh
-ansible-playbook playbooks/<hostname>/foo.yml
 ```
