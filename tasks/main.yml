@@ -22,5 +22,6 @@
       name: haveged
       state: absent
       purge: yes
+      autoremove: yes
 
   tags: virtual
