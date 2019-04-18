@@ -2,6 +2,8 @@ include_virtual_bootstrap: True
 
 virtual_template_vg: vg0
 virtual_template_name: vm-tpl
+virtual_template_path: /var/lib/img
+virtual_template_type: lv
 virtual_cpus: 1
 virtual_cpus_max: '{{ virtual_cpus }}'
 virtual_cpus_hotpluggable: '{{ True if virtual_cpus_max > virtual_cpus else False }}'
