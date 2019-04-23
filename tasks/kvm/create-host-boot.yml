@@ -34,8 +34,13 @@
   with_indexed_items: '{{ virtual_disks }}'
   when: virtual_disks is defined
 
-- name: dump root filesystem from template
+- name: dump root filesystem from template lv
   command: 'dd if=/dev/{{ virtual_template_vg }}/{{ virtual_template_name }}-{{ virtual_codename }}-root of=/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root bs=1M'
+  when: not virtual_template_type == 'file'
+
+- name: dump root filesystem from template image
+  command: 'dd if={{ virtual_template_path }}/{{ virtual_template_name }}-{{ virtual_codename }}-root of=/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root bs=1M'
+  when: virtual_template_type == 'file'
 
 - name: check root filesystem
   command: 'e2fsck -pf /dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root'
