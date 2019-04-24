@@ -30,11 +30,26 @@ ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook ...
 Bootstrap methods
 -----------------
 
-- `create-fs-boot`: creates a vm from a template lvm `root` (bootloader: extlinux) **preferred method for production**
-- `create-host-boot`: creates a vm from a template lvm `root` and boots using host boot method (kernel extracted from vm fs)
-- `create-part-boot`: creates a vm from 2 template lvms `boot` and `root` (bootloader: grub)
-- `install`: install a vm using the installer and preseed file
-- `install-manual`: install a vm using manual installation via console
+Set using `virtual_bootstrap_method`.
+
+- `create`: create vm from template disk image, **preferred method for production**
+- `install`: install vm using the installer
+
+Boot method options
+-------------------
+
+Set using `virtual_boot_method`
+
+### method create
+
+- `fs-boot`: create vm from a template disk image `root` (bootloader: extlinux), **preferred method for production**
+- `host-boot`: create vm from a template disk image `root` and boots using host boot method (kernel extracted from vm fs)
+- `part-boot`: create vm from 2 template disk images `boot` and `root` (bootloader: grub)
+
+### method install
+
+- `manual`: install vm using manual installation via console
+- `preseed`: install vm using the installer and preseed file
 
 Network
 -------
@@ -89,13 +104,15 @@ Edit the playbooks variables `virtual_guest_name`, `virtual_mac` and any other v
 
 while:
 
-- `virtual_template_vg`: the vg where to find the vm template filesystem
-- `virtual_template_name`: the lv prefix for the template, the template used will be `/dev/<virtual_template_vg>/<virtual_template_name>-<virtual_codename>-<mount_point>`
+- `virtual_template_type`: type of the template disk image, `lv` (default) or `file`
+- `virtual_template_name`: the name prefix for the template (lv or file), `-<codename>-<mount_point>` will be appended
+- `virtual_template_vg`: the vg containing the template disk lv
+- `virtual_template_path`: base-path containing file-based disk image template (default: `/var/opt/img`)
 - `virtual_guest_name`: the `<hostname>`
-- `virtual_disk_size`: is the size of the root lv (min `2G`, the default)
-- `virtual_disk_vg`: is the volume group where `<hostname>-root` (and `<hostname>-boot` in role `vm-create-part-boot`) lvs will be created
+- `virtual_disk_size`: the size of the root lv (min `2G`, the default)
+- `virtual_disk_vg`: the volume group where `<hostname>-root` (and optional `<hostname>-boot`) LVs will be created
 - `virtual_disk_fs`: the default filesystem to be used for additional `virtual_disks` with mount points
-- `virtual_disks`: is an optional parameter to create lvs for other mount points
+- `virtual_disks`: optional parameter to create lvs for other mount points
 - `virtual_guest_name`: the geuests name used in libvirt and virsh (example: `virsh start <virtual_guest_name>`), use the short hostname
 - `virtual_cpus`: amount of virtual cpus
 - `virtual_memory`: memory in MB
@@ -116,7 +133,8 @@ To create additional lvs to be used as mount points, use the `virtual_disks` dic
     - virtual_boot_method: fs-boot
     - virtual_distribution: debian
     - virtual_codename: jessie
-    - virtual_template_vg: vg0
+    - virtual_template_path: /var/opt/img
+    - virtual_template_type: file
     - virtual_template_name: vm-tpl
     - virtual_guest_name: my-host
     - virtual_cpus: 2

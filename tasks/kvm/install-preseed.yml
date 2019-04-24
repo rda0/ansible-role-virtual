@@ -1,11 +1,37 @@
 ---
-- name: create root lv
+- name: set preseed vars for ({{ virtual_distribution }}/{{ virtual_codename }})
+  include_vars: "{{ virtual_distribution }}/{{ virtual_codename }}/preseed.yml"
+
+- name: create vm dir
+  file: path={{ item }} state=directory owner=root group=root mode=0700
+  with_items:
+    - "{{ vm_path }}/{{ virtual_guest_name }}"
+
+- name: create vm web dir
+  file: path={{ item }} state=directory owner=root group=root mode=0755
+  with_items:
+    - "{{ web_path }}/{{ virtual_guest_name }}"
+
+- name: create preseed.cfg
+  template:
+    src: "{{ template_type }}/preseed-nolvm.cfg"
+    dest: "{{ vm_path }}/{{ virtual_guest_name }}/{{ initrd_inject }}"
+
+- name: create post-install.sh
+  template:
+    src: "{{ template_type }}/post-install.sh"
+    dest: "{{ web_path }}/{{ virtual_guest_name }}/post-install.sh"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: create lv
   lvol:
     vg: '{{ virtual_disk_vg }}'
     lv: '{{ virtual_guest_name }}-root'
-    size: "{{ virtual_disk_size|default('2G') }}"
+    size: '{{ virtual_disk_size }}'
 
-- name: launch vm
+- name: install vm
   command: |
     virt-install \
     --name={{ virtual_guest_name }} \
@@ -31,19 +57,21 @@
     --memballoon=none \
     {% endif %}
     --controller=type=scsi,model=virtio-scsi \
-    --disk=path=/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root,bus=scsi,cache=none,address.type=drive,address.controller=0,address.bus=0,address.target=0,address.unit=0,boot_order=1 \
+    --disk=path=/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root,bus=scsi,cache=none,address.type=drive,address.controller=0,address.bus=0,address.target=0,address.unit=0 \
+    --location={{ location }} \
     --os-type=linux \
     --os-variant={{ os_variant }} \
     --console=pty,target_type=serial \
-    --location={{ location }} \
-    --extra-args='auto=true priority=critical console=ttyS0,115200n8 serial' \
+    --initrd-inject={{ vm_path }}/{{ virtual_guest_name }}/preseed.cfg \
+    --extra-args='auto=true priority=critical elevator=noop net.ifnames=0 biosdevname=0 nousb console=tty0 console=ttyS0,115200' \
     {% if virtual_mac is defined %}
     --network=bridge={{ virtual_bridge }},model=virtio,target={{ virtual_interface_name }},mac={{ virtual_mac }} \
     {% else %}
     --network=bridge={{ virtual_bridge }},model=virtio,target={{ virtual_interface_name }} \
     {% endif %}
     --nographics \
-    --noautoconsole
+    --noautoconsole \
+    --autostart
 
 - name: wait until vm is shut off
   command: /usr/bin/virsh domstate {{ virtual_guest_name }}
