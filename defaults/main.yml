@@ -23,3 +23,6 @@ virtual_disk_fs: ext4
 virtual_bridge: br0
 virtual_interface_suffix: ''
 virtual_interface_name: "{{ virtual_guest_name | regex_replace('^phd-', '') | regex_replace('^test-', '') }}{{ virtual_interface_suffix }}"
+virtual_kernel_path: /var/opt/kernel
+virtual_kernel_disk: root
+virtual_kernel_disk_path: '/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-{{ virtual_kernel_disk }}'

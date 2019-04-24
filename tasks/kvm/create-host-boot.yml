@@ -111,6 +111,14 @@
 - name: umount root filesystem
   command: 'umount /dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root'
 
+- name: create kernel storage directory
+  file:
+    path: '{{ virtual_kernel_path }}/{{ virtual_guest_name }}'
+    state: directory
+
+- name: extract kernel from disk
+  command: 'virt-get-kernel --unversioned-names --add {{ virtual_kernel_disk_path }} --output {{ virtual_kernel_path }}/{{ virtual_guest_name }}'
+
 - name: create vm
   command: |
     virt-install \
@@ -146,7 +154,7 @@
     --os-type=linux \
     --os-variant={{ os_variant }} \
     --console=pty,target_type=serial \
-    --boot=kernel={{ kernel_path }}/{{ virtual_guest_name }}/vmlinuz,initrd={{ kernel_path }}/{{ virtual_guest_name }}/initrd.img,kernel_args="root=/dev/sda ro elevator=noop net.ifnames=0 biosdevname=0 nousb console=tty0 console=ttyS0,115200" \
+    --boot=kernel={{ virtual_kernel_path }}/{{ virtual_guest_name }}/vmlinuz,initrd={{ virtual_kernel_path }}/{{ virtual_guest_name }}/initrd.img,kernel_args="root=/dev/sda ro elevator=noop net.ifnames=0 biosdevname=0 nousb console=tty0 console=ttyS0,115200" \
     {% if virtual_mac is defined %}
     --network=bridge={{ virtual_bridge }},model=virtio,target={{ virtual_interface_name }},mac={{ virtual_mac }} \
     {% else %}

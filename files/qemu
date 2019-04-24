@@ -6,7 +6,7 @@ import errno
 from xml.etree import ElementTree
 from subprocess import Popen, PIPE
 
-KERNEL_PATH = '/var/kvm/kernel'
+KERNEL_PATH = '/var/opt/kernel'
 VIRT_GET_KERNEL = '/usr/bin/virt-get-kernel'
 
 def main():
