@@ -9,12 +9,6 @@
   when: item.stat.exists is defined and item.stat.exists == True
   with_items: '{{ virtual_disks_stat.results }}'
 
-- name: create libvirt qemu hook
-  copy:
-    src: qemu
-    dest: /etc/libvirt/hooks/qemu
-    mode: 0755
-
 - name: set fact virtual_mount_path
   set_fact:
     virtual_mount_path: "{{ virtual_mount_base_path }}/{{ virtual_guest_name }}_{{ 1000000 | random | hash('sha1') }}"
@@ -31,6 +25,10 @@
     lv: "{{ virtual_guest_name }}{{ item.1.mount|default('/dev/sd' + virtual_disks_letters[item.0])|replace('/', '-') }}"
     size: "{{ item.1.size }}"
   with_indexed_items: '{{ virtual_disks }}'
+
+- name: include partboot.yml
+  include: partboot.yml
+  when: virtual_boot_method == 'part'
 
 - name: dump root filesystem from template lv
   command: 'dd if=/dev/{{ virtual_template_vg }}/{{ virtual_template_name }}-{{ virtual_codename }}-root of=/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root bs=1M'
@@ -107,13 +105,9 @@
     path: '{{ virtual_mount_path }}'
     state: absent
 
-- name: create kernel storage directory
-  file:
-    path: '{{ virtual_kernel_base_path }}/{{ virtual_guest_name }}'
-    state: directory
-
-- name: extract kernel from disk
-  command: 'virt-get-kernel --unversioned-names --add {{ virtual_kernel_disk_path }} --output {{ virtual_kernel_base_path }}/{{ virtual_guest_name }}'
+- name: include hostboot.yml
+  include: hostboot.yml
+  when: virtual_boot_method == 'host'
 
 - name: create vm
   command: |
@@ -141,7 +135,10 @@
     --memballoon=none \
     {% endif %}
     --controller=type=scsi,model=virtio-scsi \
-    --disk=path=/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root,bus=scsi,cache=none,address.type=drive,address.controller=0,address.bus=0,address.target=0,address.unit=0,boot_order=1 \
+    {% if virtual_boot_method == 'part' %}
+    --disk=path=/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-boot,bus=scsi,cache=none,address.type=drive,address.controller=0,address.bus=0,address.target=0,address.unit=0,boot_order=1 \
+    {% endif %}
+    --disk=path=/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root,bus=scsi,cache=none,address.type=drive,address.controller=0,address.bus=0,address.target={{ virtual_disk_boot_index }},address.unit={{ virtual_disk_boot_index }}{{ '' if virtual_boot_method == 'part' else ',boot_order=1' }} \
     {% for disk in virtual_disks|default([]) %}
     --disk=path=/dev/{{ (disk.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ disk.mount|default('/dev/sd' + virtual_disks_letters[loop.index - 1])|replace('/', '-') }},bus=scsi,cache=none,address.type=drive,address.controller=0,address.bus=0,address.target={{ loop.index + virtual_disk_boot_index|int }},address.unit={{ loop.index + virtual_disk_boot_index|int }} \
     {% endfor %}
@@ -149,7 +146,9 @@
     --os-type=linux \
     --os-variant={{ os_variant }} \
     --console=pty,target_type=serial \
+    {% if virtual_boot_method == 'host' %}
     --boot=kernel={{ virtual_kernel_base_path }}/{{ virtual_guest_name }}/vmlinuz,initrd={{ virtual_kernel_base_path }}/{{ virtual_guest_name }}/initrd.img,kernel_args="{{ virtual_kernel_args }}" \
+    {% endif %}
     {% if virtual_mac is defined %}
     --network=bridge={{ virtual_bridge }},model=virtio,target={{ virtual_interface_name }},mac={{ virtual_mac }} \
     {% else %}

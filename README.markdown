@@ -42,9 +42,9 @@ Set using `virtual_boot_method`
 
 ### method create
 
-- `fs-boot`: create vm from a template disk image `root` (bootloader: extlinux), **preferred method for production**
-- `host-boot`: create vm from a template disk image `root` and boots using host boot method (kernel extracted from vm fs)
-- `part-boot`: create vm from 2 template disk images `boot` and `root` (bootloader: grub)
+- `fs`: create vm from a template disk image `root` (bootloader: extlinux), **preferred method for production**
+- `host`: create vm from a template disk image `root` and boots using host boot method (kernel extracted from vm fs)
+- `part`: create vm from 2 template disk images `boot` and `root` (bootloader: grub)
 
 ### method install
 
@@ -86,7 +86,7 @@ Edit the playbooks variables `virtual_guest_name`, `virtual_mac` and any other v
     - virtual_hypervisor_host: my-kvm-hypervisor
     - virtual_hypervisor_type: kvm
     - virtual_bootstrap_method: create
-    - virtual_boot_method: fs-boot
+    - virtual_boot_method: fs
     - virtual_distribution: debian
     - virtual_codename: stretch
     - virtual_template_vg: r10
@@ -130,7 +130,7 @@ To create additional lvs to be used as mount points, use the `virtual_disks` dic
     - virtual_hypervisor_host: my-kvm-hypervisor
     - virtual_hypervisor_type: kvm
     - virtual_bootstrap_method: create
-    - virtual_boot_method: fs-boot
+    - virtual_boot_method: fs
     - virtual_distribution: debian
     - virtual_codename: jessie
     - virtual_template_path: /var/opt/img

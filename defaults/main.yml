@@ -1,5 +1,7 @@
 include_virtual_bootstrap: True
 
+virtual_qemu_hook_create: True
+
 # Minimal required variables to be set in the inventory
 # -----------------------------------------------------
 
@@ -19,7 +21,7 @@ include_virtual_bootstrap: True
 
 virtual_guest_name: '{{ inventory_hostname }}'
 virtual_bootstrap_method: create
-virtual_boot_method: fs-boot
+virtual_boot_method: fs
 virtual_template_vg: vg0
 virtual_template_name: vm-tpl
 virtual_template_path: /var/opt/img
@@ -42,10 +44,11 @@ virtual_disk_vg: vg0
 virtual_disk_fs: ext4
 virtual_disk_mount_options: noatime,nodiratime
 virtual_disk_letters: 'abcdefghijklmnopqrstuvwxyz'
-virtual_disk_boot_index: "{{ 1 if virtual_boot_method == 'part-boot' else 0 }}"
+virtual_disk_boot_size: 512M
+virtual_disk_boot_index: "{{ 1 if virtual_boot_method == 'part' else 0 }}"
 virtual_disks: []
 virtual_disks_letters_skip: '{{ virtual_disk_boot_index|int + 1 }}'
-virtual_disks_letters: "{{ virtual_disk_letters[virtual_disks_letters_skip|int:] if virtual_boot_method == 'part-boot' else virtual_disk_letters[virtual_disks_letters_skip|int:] }}"
+virtual_disks_letters: "{{ virtual_disk_letters[virtual_disks_letters_skip|int:] if virtual_boot_method == 'part' else virtual_disk_letters[virtual_disks_letters_skip|int:] }}"
 virtual_bridge: br0
 virtual_interface_suffix: ''
 virtual_interface_replace_regex: '^phd-(test-)?'

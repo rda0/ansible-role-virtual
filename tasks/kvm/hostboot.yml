@@ -1,0 +1,18 @@
+---
+- name: create libvirt qemu hook
+  copy:
+    src: qemu
+    dest: /etc/libvirt/hooks/qemu
+    mode: 0755
+  when: virtual_qemu_hook_create
+
+- name: create kernel storage directory
+  file:
+    path: '{{ virtual_kernel_base_path }}/{{ virtual_guest_name }}'
+    state: directory
+
+- name: extract kernel from disk
+  command: 'virt-get-kernel --unversioned-names --add {{ virtual_kernel_disk_path }} --output {{ virtual_kernel_base_path }}/{{ virtual_guest_name }}'
+  args:
+    creates: '{{ virtual_kernel_base_path }}/{{ virtual_guest_name }}/vmlinuz'
+
