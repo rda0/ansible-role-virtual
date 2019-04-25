@@ -144,7 +144,7 @@
     --disk=path=/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-boot,bus=scsi,cache=none,address.type=drive,address.controller=0,address.bus=0,address.target=0,address.unit=0,boot_order=1 \
     --disk=path=/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root,bus=scsi,cache=none,address.type=drive,address.controller=0,address.bus=0,address.target=1,address.unit=1 \
     {% for disk in virtual_disks|default([]) %}
-    --disk=path=/dev/{{ (disk.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ disk.mount|default('/dev/sd' + virtual_disks_letters[loop.index - 1])|replace('/', '-') }},bus=scsi,cache=none,address.type=drive,address.controller=0,address.bus=0,address.target={{ loop.index + 1 }},address.unit={{ loop.index + 1 }} \
+    --disk=path=/dev/{{ (disk.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ disk.mount|default('/dev/sd' + virtual_disks_letters[loop.index - 1])|replace('/', '-') }},bus=scsi,cache=none,address.type=drive,address.controller=0,address.bus=0,address.target={{ loop.index + virtual_disk_boot_index|int }},address.unit={{ loop.index + virtual_disk_boot_index|int }} \
     {% endfor %}
     --import \
     --os-type=linux \

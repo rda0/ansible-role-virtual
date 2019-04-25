@@ -42,8 +42,10 @@ virtual_disk_vg: vg0
 virtual_disk_fs: ext4
 virtual_disk_mount_options: noatime,nodiratime
 virtual_disk_letters: 'abcdefghijklmnopqrstuvwxyz'
+virtual_disk_boot_index: "{{ 1 if virtual_boot_method == 'part-boot' else 0 }}"
 virtual_disks: []
-virtual_disks_letters: "{{ virtual_disk_letters[2:] if virtual_boot_method == 'part-boot' else virtual_disk_letters[1:] }}"
+virtual_disks_letters_skip: '{{ virtual_disk_boot_index|int + 1 }}'
+virtual_disks_letters: "{{ virtual_disk_letters[virtual_disks_letters_skip|int:] if virtual_boot_method == 'part-boot' else virtual_disk_letters[virtual_disks_letters_skip|int:] }}"
 virtual_bridge: br0
 virtual_interface_suffix: ''
 virtual_interface_replace_regex: '^phd-(test-)?'
