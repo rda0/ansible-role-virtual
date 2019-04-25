@@ -7,16 +7,15 @@
     path: '/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root'
   register: virtual_disk_root_stat
 
-- name: check if '/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-boot' exists
-  stat:
-    path: '/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-boot'
-  register: virtual_disk_boot_stat
-
 - name: check if '/etc/libvirt/qemu/{{ virtual_guest_name }}.xml' exists
   stat:
     path: '/etc/libvirt/qemu/{{ virtual_guest_name }}.xml'
   register: virtual_guest_xml_stat
 
-- name: include '{{ virtual_hypervisor_type }}/{{ virtual_bootstrap_method }}-{{ virtual_boot_method }}.yml'
-  include_tasks: '{{ virtual_hypervisor_type }}/{{ virtual_bootstrap_method }}-{{ virtual_boot_method }}.yml'
-  when: not ((virtual_disk_root_stat.stat.exists is defined and virtual_disk_root_stat.stat.exists == True) or (virtual_disk_boot_stat.stat.exists is defined and virtual_disk_boot_stat.stat.exists == True) or (virtual_guest_xml_stat.stat.exists is defined and virtual_guest_xml_stat.stat.exists == True))
+- name: include create disks
+  include_tasks: '{{ virtual_hypervisor_type }}/create-disks.yml'
+  when: not (virtual_disk_root_stat.stat.exists is defined and virtual_disk_root_stat.stat.exists == True)
+
+- name: include define guest
+  include_tasks: '{{ virtual_hypervisor_type }}/define-guest.yml'
+  when: not (virtual_guest_xml_stat.stat.exists is defined and virtual_guest_xml_stat.stat.exists == True)
