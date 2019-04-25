@@ -77,7 +77,7 @@
   when: virtual_disks is defined
 
 - name: make disk filesystems
-  command: "mkfs.{{ (item.1.fs|default(virtual_disk_fs)) }} /dev/{{ (item.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.mount|replace('/', '-') }}"
+  command: "mkfs.{{ (item.fs|default(virtual_disk_fs)) }} /dev/{{ (item.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.mount|replace('/', '-') }}"
   with_items: '{{ virtual_disks | selectattr("mount", "defined") | list }}'
   when: virtual_disks is defined
 
@@ -154,7 +154,7 @@
     --os-type=linux \
     --os-variant={{ os_variant }} \
     --console=pty,target_type=serial \
-    --boot=kernel={{ virtual_kernel_path }}/{{ virtual_guest_name }}/vmlinuz,initrd={{ virtual_kernel_path }}/{{ virtual_guest_name }}/initrd.img,kernel_args="root=/dev/sda ro elevator=noop net.ifnames=0 biosdevname=0 nousb console=tty0 console=ttyS0,115200" \
+    --boot=kernel={{ virtual_kernel_path }}/{{ virtual_guest_name }}/vmlinuz,initrd={{ virtual_kernel_path }}/{{ virtual_guest_name }}/initrd.img,kernel_args="root=/dev/sda ro net.ifnames=0 biosdevname=0 nousb console=tty0 console=ttyS0,115200n8 elevator=noop" \
     {% if virtual_mac is defined %}
     --network=bridge={{ virtual_bridge }},model=virtio,target={{ virtual_interface_name }},mac={{ virtual_mac }} \
     {% else %}
