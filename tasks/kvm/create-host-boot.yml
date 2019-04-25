@@ -5,7 +5,7 @@
   with_indexed_items: '{{ virtual_disks }}'
 
 - fail:
-    msg: 'guest lv already exists: {{ item.invocation.module_args.path }}'
+    msg: 'guest disk already exists: {{ item.invocation.module_args.path }}'
   when: item.stat.exists is defined and item.stat.exists == True
   with_items: '{{ virtual_disks_stat.results }}'
 
