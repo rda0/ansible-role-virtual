@@ -1,6 +1,6 @@
 ---
 - stat:
-    path: "{% set letters='cdefghijklmnopqrstuvwxyz' %}/dev/{{ (item.1.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.1.mount|default('/dev/sd' + letters[item.0])|replace('/', '-') }}"
+    path: "/dev/{{ (item.1.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.1.mount|default('/dev/sd' + virtual_disks_letters[item.0])|replace('/', '-') }}"
   register: virtual_disks_stat
   with_indexed_items: '{{ virtual_disks }}'
 
@@ -28,7 +28,7 @@
 - name: create disk lvs
   lvol:
     vg: '{{ (item.1.vg|default(virtual_disk_vg)) }}'
-    lv: "{% set letters='cdefghijklmnopqrstuvwxyz' %}{{ virtual_guest_name }}{{ item.1.mount|default('/dev/sd' + letters[item.0])|replace('/', '-') }}"
+    lv: "{{ virtual_guest_name }}{{ item.1.mount|default('/dev/sd' + virtual_disks_letters[item.0])|replace('/', '-') }}"
     size: "{{ item.1.size }}"
   with_indexed_items: '{{ virtual_disks }}'
 
@@ -77,7 +77,7 @@
   shell: 'echo "{{ virtual_guest_name }}" > {{ virtual_mount_path }}/root/etc/hostname'
 
 - name: add disks to fstab
-  shell: "echo '{% set letters='cdefghijklmnopqrstuvwxyz' %}/dev/sd{{ letters[item.0] }}  {{ item.1.mount }}  {{ (item.1.fs|default(virtual_disk_fs)) }} defaults          0 2' >> {{ virtual_mount_path }}/root/etc/fstab"
+  shell: "echo '/dev/sd{{ virtual_disks_letters[item.0] }}  {{ item.1.mount }}  {{ (item.1.fs|default(virtual_disk_fs)) }} defaults          0 2' >> {{ virtual_mount_path }}/root/etc/fstab"
   with_indexed_items: '{{ virtual_disks | selectattr("mount", "defined") | list }}'
 
 - name: make disk filesystems
@@ -143,9 +143,8 @@
     --controller=type=scsi,model=virtio-scsi \
     --disk=path=/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-boot,bus=scsi,cache=none,address.type=drive,address.controller=0,address.bus=0,address.target=0,address.unit=0,boot_order=1 \
     --disk=path=/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root,bus=scsi,cache=none,address.type=drive,address.controller=0,address.bus=0,address.target=1,address.unit=1 \
-    {% set letters='cdefghijklmnopqrstuvwxyz' %}
     {% for disk in virtual_disks|default([]) %}
-    --disk=path=/dev/{{ (disk.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ disk.mount|default('/dev/sd' + letters[loop.index - 1])|replace('/', '-') }},bus=scsi,cache=none,address.type=drive,address.controller=0,address.bus=0,address.target={{ loop.index + 1 }},address.unit={{ loop.index + 1 }} \
+    --disk=path=/dev/{{ (disk.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ disk.mount|default('/dev/sd' + virtual_disks_letters[loop.index - 1])|replace('/', '-') }},bus=scsi,cache=none,address.type=drive,address.controller=0,address.bus=0,address.target={{ loop.index + 1 }},address.unit={{ loop.index + 1 }} \
     {% endfor %}
     --import \
     --os-type=linux \
