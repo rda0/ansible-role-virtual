@@ -119,6 +119,11 @@
 - name: umount root filesystem
   command: 'umount /dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root'
 
+- name: remove mount dir
+  file:
+    path: '{{ mount_path }}'
+    state: absent
+
 - name: create vm
   command: |
     virt-install \
