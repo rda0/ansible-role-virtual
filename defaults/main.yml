@@ -1,9 +1,29 @@
 include_virtual_bootstrap: True
 
+# Minimal required variables to be set in the inventory
+# -----------------------------------------------------
+
+# Required variables for hypervisor selection
+
+#virtual_hypervisor_host: hostname
+#virtual_hypervisor_type: kvm
+
+# Required variables for the guest
+
+#virtual_distribution: debian, ubuntu, kali, ...
+#virtual_codename: buster, stretch, bionic, kali-rolling, ...
+#virtual_mac: 52:54:00:xx:xx:xx
+
+# Default values (may be overridden in the inventory)
+# ---------------------------------------------------
+
+virtual_guest_name: '{{ inventory_hostname }}'
+virtual_bootstrap_method: create
+virtual_boot_method: fs-boot
 virtual_template_vg: vg0
 virtual_template_name: vm-tpl
 virtual_template_path: /var/opt/img
-virtual_template_type: lv
+virtual_template_type: file
 virtual_cpus: 1
 virtual_cpus_max: '{{ virtual_cpus }}'
 virtual_cpus_hotpluggable: '{{ True if virtual_cpus_max > virtual_cpus else False }}'
@@ -22,7 +42,8 @@ virtual_disk_vg: vg0
 virtual_disk_fs: ext4
 virtual_bridge: br0
 virtual_interface_suffix: ''
-virtual_interface_name: "{{ virtual_guest_name | regex_replace('^phd-', '') | regex_replace('^test-', '') }}{{ virtual_interface_suffix }}"
+virtual_interface_replace_regex: '^phd-(test-)?'
+virtual_interface_name: "{{ virtual_guest_name | regex_replace(virtual_interface_replace_regex, '') }}{{ virtual_interface_suffix }}"
 virtual_kernel_path: /var/opt/kernel
 virtual_kernel_disk: root
 virtual_kernel_disk_path: '/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-{{ virtual_kernel_disk }}'
