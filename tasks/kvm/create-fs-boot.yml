@@ -12,7 +12,7 @@
 
 - name: set fact mount_path
   set_fact:
-    mount_path: "/mnt/ansible/{{ virtual_guest_name }}_{{ 1000000 | random | hash('sha1') }}"
+    mount_path: "{{ virtual_mount_base_path }}/{{ virtual_guest_name }}_{{ 1000000 | random | hash('sha1') }}"
 
 - name: create root lv
   lvol:
