@@ -5,18 +5,18 @@
 - name: check if '/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root' exists
   stat:
     path: '/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root'
-  register: guest_lvm_root
+  register: virtual_disk_root_stat
 
 - name: check if '/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-boot' exists
   stat:
     path: '/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-boot'
-  register: guest_lvm_boot
+  register: virtual_disk_boot_stat
 
 - name: check if '/etc/libvirt/qemu/{{ virtual_guest_name }}.xml' exists
   stat:
     path: '/etc/libvirt/qemu/{{ virtual_guest_name }}.xml'
-  register: guest_xml
+  register: virtual_guest_xml_stat
 
 - name: include '{{ virtual_hypervisor_type }}/{{ virtual_bootstrap_method }}-{{ virtual_boot_method }}.yml'
   include_tasks: '{{ virtual_hypervisor_type }}/{{ virtual_bootstrap_method }}-{{ virtual_boot_method }}.yml'
-  when: not ((guest_lvm_root.stat.exists is defined and guest_lvm_root.stat.exists == True) or (guest_lvm_boot.stat.exists is defined and guest_lvm_boot.stat.exists == True) or (guest_xml.stat.exists is defined and guest_xml.stat.exists == True))
+  when: not ((virtual_disk_root_stat.stat.exists is defined and virtual_disk_root_stat.stat.exists == True) or (virtual_disk_boot_stat.stat.exists is defined and virtual_disk_boot_stat.stat.exists == True) or (virtual_guest_xml_stat.stat.exists is defined and virtual_guest_xml_stat.stat.exists == True))

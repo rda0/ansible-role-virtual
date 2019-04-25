@@ -1,14 +1,13 @@
 ---
 - stat:
     path: "{% set letters='bcdefghijklmnopqrstuvwxyz' %}/dev/{{ (item.1.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.1.mount|default('/dev/sd' + letters[item.0])|replace('/', '-') }}"
-  register: guest_lvm_disks
+  register: virtual_disks_stat
   with_indexed_items: '{{ virtual_disks }}'
-  when: virtual_disks is defined
 
 - fail:
-    msg: 'guest lvm already exists: {{ item.invocation.module_args.path }}'
-  when: virtual_disks is defined and item.stat.exists is defined and item.stat.exists == True
-  with_items: '{{ guest_lvm_disks.results }}'
+    msg: 'guest lv already exists: {{ item.invocation.module_args.path }}'
+  when: item.stat.exists is defined and item.stat.exists == True
+  with_items: '{{ virtual_disks_stat.results }}'
 
 - name: create libvirt qemu hook
   copy:
@@ -32,7 +31,6 @@
     lv: "{% set letters='bcdefghijklmnopqrstuvwxyz' %}{{ virtual_guest_name }}{{ item.1.mount|default('/dev/sd' + letters[item.0])|replace('/', '-') }}"
     size: "{{ item.1.size }}"
   with_indexed_items: '{{ virtual_disks }}'
-  when: virtual_disks is defined
 
 - name: dump root filesystem from template lv
   command: 'dd if=/dev/{{ virtual_template_vg }}/{{ virtual_template_name }}-{{ virtual_codename }}-root of=/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root bs=1M'
@@ -61,7 +59,6 @@
     path: "{{ virtual_mount_path }}/{{ item.mount[1:]|replace('/', '-') }}"
     state: directory
   with_items: '{{ virtual_disks | selectattr("mount", "defined") | list }}'
-  when: virtual_disks is defined
 
 - name: mount root filesystem
   command: 'mount /dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root {{ virtual_mount_path }}/root'
@@ -74,26 +71,22 @@
 - name: add disks to fstab
   shell: "echo '{% set letters='bcdefghijklmnopqrstuvwxyz' %}/dev/sd{{ letters[item.0] }}  {{ item.1.mount }}  {{ (item.1.fs|default(virtual_disk_fs)) }} defaults          0 2' >> {{ virtual_mount_path }}/root/etc/fstab"
   with_indexed_items: '{{ virtual_disks | selectattr("mount", "defined") | list }}'
-  when: virtual_disks is defined
 
 - name: make disk filesystems
   command: "mkfs.{{ (item.fs|default(virtual_disk_fs)) }} /dev/{{ (item.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.mount|replace('/', '-') }}"
   with_items: '{{ virtual_disks | selectattr("mount", "defined") | list }}'
-  when: virtual_disks is defined
 
 - name: create mount points in root filesystem
   file:
     path: "{{ virtual_mount_path }}/root{{ item.mount }}"
     state: directory
   with_items: '{{ virtual_disks | selectattr("mount", "defined") | list }}'
-  when: virtual_disks is defined
 
 - name: mount disk filesystems
   command: "mount /dev/{{ (item.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.mount|replace('/', '-') }} {{ virtual_mount_path }}/{{ item.mount[1:]|replace('/', '-') }}"
   args:
     warn: false
   with_items: '{{ virtual_disks | selectattr("mount", "defined") | list }}'
-  when: virtual_disks is defined
 
 - name: move files to separate disks
   shell: "mv {{ virtual_mount_path }}/root{{ item.mount }}/* {{ virtual_mount_path }}/{{ item.mount[1:]|replace('/', '-') }}/; umount /dev/{{ (item.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.mount|replace('/', '-') }}; mount /dev/{{ (item.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.mount|replace('/', '-') }} {{ virtual_mount_path }}/root{{ item.mount }}"
@@ -101,12 +94,10 @@
     warn: false
   ignore_errors: yes
   with_items: '{{ virtual_disks | selectattr("mount", "defined") | list }}'
-  when: virtual_disks is defined
 
 - name: umount disk filesystems
   command: "umount /dev/{{ (item.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.mount|replace('/', '-') }}"
   with_items: '{{ virtual_disks | selectattr("mount", "defined") | list | reverse | list }}'
-  when: virtual_disks is defined
 
 - name: umount root filesystem
   command: 'umount /dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root'

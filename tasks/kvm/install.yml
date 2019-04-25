@@ -1,17 +1,1 @@
----
-- name: 'set vm vars for ({{ virtual_distribution }}/{{ virtual_codename }})'
-  include_vars: "{{ virtual_distribution }}/{{ virtual_codename }}/vm.yml"
-
-- name: check if '/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root' exists
-  stat:
-    path: '/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root'
-  register: guest_lvm_root
-
-- name: check if '/etc/libvirt/qemu/{{ virtual_guest_name }}.xml' exists
-  stat:
-    path: '/etc/libvirt/qemu/{{ virtual_guest_name }}.xml'
-  register: guest_xml
-
-- name: include '{{ virtual_hypervisor_type }}/{{ virtual_bootstrap_method }}-{{ virtual_boot_method }}.yml'
-  include_tasks: '{{ virtual_hypervisor_type }}/{{ virtual_bootstrap_method }}-{{ virtual_boot_method }}.yml'
-  when: not ((guest_lvm_root.stat.exists is defined and guest_lvm_root.stat.exists == True) or (guest_xml.stat.exists is defined and guest_xml.stat.exists == True))
+create.yml
