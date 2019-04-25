@@ -16,39 +16,32 @@ virtual_qemu_hook_create: True
 #virtual_codename: buster, stretch, bionic, kali-rolling, ...
 #virtual_mac: 52:54:00:xx:xx:xx
 
-# Default values (may be overridden in the inventory)
-# ---------------------------------------------------
+# Default variables (may be overridden in the inventory)
+# ------------------------------------------------------
 
 virtual_guest_name: '{{ inventory_hostname }}'
 virtual_bootstrap_method: create
 virtual_boot_method: fs
 virtual_template_vg: vg0
-virtual_template_name: vm-tpl
 virtual_template_path: /var/opt/img
 virtual_template_type: file
+virtual_template_name_prefix: tpl
 virtual_cpus: 1
 virtual_cpus_max: '{{ virtual_cpus }}'
-virtual_cpus_hotpluggable: '{{ True if virtual_cpus_max > virtual_cpus else False }}'
 virtual_memory: 1024
 virtual_memory_max: '{{ virtual_memory }}'
-virtual_memory_hotpluggable: '{{ True if virtual_memory_max > virtual_memory else False }}'
 virtual_memory_slots: 16
 virtual_memory_balloon: False
 virtual_memory_hugepages: True
 virtual_memory_hugepages_size: 2048
 virtual_memory_hugepages_unit: KiB
-virtual_numa_cell_cpus: '0-{{ virtual_cpus_max-1 | int | abs }}'
-virtual_numa_cell_memory: '{{ virtual_memory*1024 | int | abs }}'
-virtual_disk_size: 2G
+virtual_disk_size_root: 2G
+virtual_disk_size_boot: 512M
 virtual_disk_vg: vg0
 virtual_disk_fs: ext4
 virtual_disk_mount_options: noatime,nodiratime
 virtual_disk_letters: 'abcdefghijklmnopqrstuvwxyz'
-virtual_disk_boot_size: 512M
-virtual_disk_boot_index: "{{ 1 if virtual_boot_method == 'part' else 0 }}"
 virtual_disks: []
-virtual_disks_letters_skip: '{{ virtual_disk_boot_index|int + 1 }}'
-virtual_disks_letters: "{{ virtual_disk_letters[virtual_disks_letters_skip|int:] if virtual_boot_method == 'part' else virtual_disk_letters[virtual_disks_letters_skip|int:] }}"
 virtual_bridge: br0
 virtual_interface_suffix: ''
 virtual_interface_replace_regex: '^phd-(test-)?'
@@ -61,3 +54,23 @@ virtual_kernel_args_common: 'net.ifnames=0 biosdevname=0 nousb console=tty0 cons
 virtual_kernel_args_root: '/dev/sda'
 virtual_kernel_args: 'root={{ virtual_kernel_args_root }} ro {{ virtual_kernel_args_common }}'
 virtual_install_kernel_args: 'auto=true priority=critical {{ virtual_kernel_args_common }}'
+
+# Conditional variables (only override if you know what you are doing)
+# --------------------------------------------------------------------
+
+virtual_template_prefix:
+  file: '{{ virtual_template_path }}'
+  lv: '/dev/{{ virtual_template_vg }}'
+virtual_template_suffix: '{{ virtual_template_name_prefix }}-{{ virtual_boot_method }}-{{ virtual_codename }}'
+virtual_template_base: '{{ virtual_template_prefix[virtual_template_type] }}/{{ virtual_template_suffix }}'
+virtual_disks_main: "{{ ['root','boot'] if virtual_boot_method == 'part' else ['root'] }}"
+virtual_disks_main_size:
+  root: '{{ virtual_disk_size_root }}'
+  boot: '{{ virtual_disk_size_boot }}'
+virtual_cpus_hotpluggable: '{{ True if virtual_cpus_max > virtual_cpus else False }}'
+virtual_memory_hotpluggable: '{{ True if virtual_memory_max > virtual_memory else False }}'
+virtual_numa_cell_cpus: '0-{{ virtual_cpus_max-1 | int | abs }}'
+virtual_numa_cell_memory: '{{ virtual_memory*1024 | int | abs }}'
+virtual_disk_boot_index: "{{ 1 if virtual_boot_method == 'part' else 0 }}"
+virtual_disks_letters_skip: '{{ virtual_disk_boot_index|int + 1 }}'
+virtual_disks_letters: "{{ virtual_disk_letters[virtual_disks_letters_skip|int:] if virtual_boot_method == 'part' else virtual_disk_letters[virtual_disks_letters_skip|int:] }}"

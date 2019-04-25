@@ -13,30 +13,23 @@
   set_fact:
     virtual_mount_path: "{{ virtual_mount_base_path }}/{{ virtual_guest_name }}_{{ 1000000 | random | hash('sha1') }}"
 
-- name: create root lv
+- name: "create main disks ({{ ', '.join(virtual_disks_main) }}) lv(s)"
   lvol:
     vg: '{{ virtual_disk_vg }}'
-    lv: '{{ virtual_guest_name }}-root'
-    size: "{{ virtual_disk_size|default('2G') }}"
+    lv: '{{ virtual_guest_name }}-{{ item }}'
+    size: '{{ virtual_disks_main_size[item] }}'
+  loop: '{{ virtual_disks_main }}'
 
-- name: create disk lvs
+- name: create extra disk(s) lv(s)
   lvol:
     vg: '{{ (item.1.vg|default(virtual_disk_vg)) }}'
     lv: "{{ virtual_guest_name }}{{ item.1.mount|default('/dev/sd' + virtual_disks_letters[item.0])|replace('/', '-') }}"
     size: "{{ item.1.size }}"
   with_indexed_items: '{{ virtual_disks }}'
 
-- name: include partboot.yml
-  include: partboot.yml
-  when: virtual_boot_method == 'part'
-
-- name: dump root filesystem from template lv
-  command: 'dd if=/dev/{{ virtual_template_vg }}/{{ virtual_template_name }}-{{ virtual_codename }}-root of=/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root bs=1M'
-  when: not virtual_template_type == 'file'
-
-- name: dump root filesystem from template image
-  command: 'dd if={{ virtual_template_path }}/{{ virtual_template_name }}-{{ virtual_codename }}-root of=/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root bs=1M'
-  when: virtual_template_type == 'file'
+- name: "clone disks ({{ ', '.join(virtual_disks_main) }}) from template"
+  command: 'dd if={{ virtual_template_base }}-{{ item }} of=/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-{{ item }} bs=1M'
+  loop: '{{ virtual_disks_main }}'
 
 - name: check root filesystem
   command: 'e2fsck -pf /dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root'
