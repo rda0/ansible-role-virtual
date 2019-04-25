@@ -40,6 +40,7 @@ virtual_numa_cell_memory: '{{ virtual_memory*1024 | int | abs }}'
 virtual_disk_size: 2G
 virtual_disk_vg: vg0
 virtual_disk_fs: ext4
+virtual_disk_mount_options: noatime,nodiratime
 virtual_disk_letters: 'abcdefghijklmnopqrstuvwxyz'
 virtual_disks: []
 virtual_disks_letters: "{{ virtual_disk_letters[2:] if virtual_boot_method == 'part-boot' else virtual_disk_letters[1:] }}"

@@ -152,6 +152,7 @@ To create additional lvs to be used as mount points, use the `virtual_disks` dic
         - mount: /export
           size: 100G
           vg: vg1-data
+          options: defaults
         - mount: /scratch
           size: 20G
           vg: vg1-data
@@ -161,7 +162,7 @@ To create additional lvs to be used as mount points, use the `virtual_disks` dic
     - virtual
 ```
 
-The above will create the following disks and mount points (if `disk.vg` or  `disk.fs` is omitted, the value from `virtual_disk_vg` or `virtual_disk_fs` for the root disk will be used):
+The above will create the following disks and mount points (if `disk.vg`, `disk.fs` or `disk.options` is omitted, the value from `virtual_disk_vg`, `virtual_disk_fs` or `virtual_disk_mount_options` will be used):
 
 ```
 /dev/sda /        ext3   4G vg0
