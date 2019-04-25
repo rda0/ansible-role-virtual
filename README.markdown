@@ -1,15 +1,19 @@
 ansible-role-virtual
 ====================
 
-Description
+Ansible role to deploy virtual hosts on a hypervisor.
+
+Hypervisors
 -----------
 
-Ansible role to deploy virtual machines on a `kvm` hypervisor.
+The following hypervisors are currently supported:
+
+- `kvm`: QEMU-KVM
 
 Playbook
 --------
 
-When including this role, disable facts gathering in the playbook:
+When including this role, disable facts gathering in the playbook. This is required because the virtual host (`inventory_hostname`) first needs to be created and/or started:
 
 ```yaml
 - hosts: my-host
@@ -90,11 +94,11 @@ Edit the playbooks variables `virtual_guest_name`, `virtual_mac` and any other v
     - virtual_distribution: debian
     - virtual_codename: stretch
     - virtual_template_vg: r10
-    - virtual_template_name: vm-tpl
+    - virtual_template_name_prefix: tpl
     - virtual_guest_name: my-host
     - virtual_cpus: 4
     - virtual_memory: 4096
-    - virtual_disk_size: 10G
+    - virtual_disk_size_root: 10G
     - virtual_disk_vg: r10
     - virtual_bridge: br0
     - virtual_mac: 52:54:00:7a:3b:8f
@@ -105,11 +109,12 @@ Edit the playbooks variables `virtual_guest_name`, `virtual_mac` and any other v
 while:
 
 - `virtual_template_type`: type of the template disk image, `lv` (default) or `file`
-- `virtual_template_name`: the name prefix for the template (lv or file), `-<codename>-<mount_point>` will be appended
+- `virtual_template_name_prefix`: the name prefix for the template filename (lv or file), `-<boot_method>-<codename>-<mount_point>` will be appended
 - `virtual_template_vg`: the vg containing the template disk lv
 - `virtual_template_path`: base-path containing file-based disk image template (default: `/var/opt/img`)
-- `virtual_guest_name`: the `<hostname>`
-- `virtual_disk_size`: the size of the root lv (min `2G`, the default)
+- `virtual_guest_name`: the guests name (default: `inventory_hostname`)
+- `virtual_disk_size_root`: the size of the root lv (min `2G`, the default)
+- `virtual_disk_size_boot`: the size of the boot lv (min `512M`, the default)
 - `virtual_disk_vg`: the volume group where `<hostname>-root` (and optional `<hostname>-boot`) LVs will be created
 - `virtual_disk_fs`: the default filesystem to be used for additional `virtual_disks` with mount points
 - `virtual_disks`: optional parameter to create lvs for other mount points
@@ -135,11 +140,11 @@ To create additional lvs to be used as mount points, use the `virtual_disks` dic
     - virtual_codename: jessie
     - virtual_template_path: /var/opt/img
     - virtual_template_type: file
-    - virtual_template_name: vm-tpl
+    - virtual_template_name_prefix: tpl
     - virtual_guest_name: my-host
     - virtual_cpus: 2
     - virtual_memory: 2048
-    - virtual_disk_size: 4G
+    - virtual_disk_size_root: 4G
     - virtual_disk_vg: vg0
     - virtual_disk_fs: ext3
     - virtual_bridge: br0

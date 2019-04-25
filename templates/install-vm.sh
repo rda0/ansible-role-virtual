@@ -8,7 +8,7 @@ virt-install \
 --vcpus={{ virtual_cpus }} \
 --memory={{ virtual_memory }} \
 --controller type=scsi,model=virtio-scsi \
---disk=/var/lib/libvirt/images/{{ virtual_guest_name }}.qcow2,format=qcow2,size={{ virtual_disk_size }},bus=scsi,cache=none \
+--disk=/var/lib/libvirt/images/{{ virtual_guest_name }}.qcow2,format=qcow2,size={{ virtual_disk_size_root }},bus=scsi,cache=none \
 --location={{ location }} \
 --os-type=linux \
 --os-variant={{ os_variant }} \

@@ -3,7 +3,7 @@
   lvol:
     vg: '{{ virtual_disk_vg }}'
     lv: '{{ virtual_guest_name }}-root'
-    size: "{{ virtual_disk_size|default('2G') }}"
+    size: "{{ virtual_disk_size_root }}"
 
 - name: launch vm
   command: |

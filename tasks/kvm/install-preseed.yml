@@ -29,7 +29,7 @@
   lvol:
     vg: '{{ virtual_disk_vg }}'
     lv: '{{ virtual_guest_name }}-root'
-    size: '{{ virtual_disk_size }}'
+    size: '{{ virtual_disk_size_root }}'
 
 - name: install vm
   command: |
