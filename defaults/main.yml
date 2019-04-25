@@ -45,6 +45,10 @@ virtual_interface_suffix: ''
 virtual_interface_replace_regex: '^phd-(test-)?'
 virtual_interface_name: "{{ virtual_guest_name | regex_replace(virtual_interface_replace_regex, '') }}{{ virtual_interface_suffix }}"
 virtual_mount_base_path: /mnt/ansible/virtual
-virtual_kernel_path: /var/opt/kernel
+virtual_kernel_base_path: /var/opt/kernel
 virtual_kernel_disk: root
 virtual_kernel_disk_path: '/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-{{ virtual_kernel_disk }}'
+virtual_kernel_args_common: 'net.ifnames=0 biosdevname=0 nousb console=tty0 console=ttyS0,115200n8 elevator=noop'
+virtual_kernel_args_root: '/dev/sda'
+virtual_kernel_args: 'root={{ virtual_kernel_args_root }} ro {{ virtual_kernel_args_common }}'
+virtual_install_kernel_args: 'auto=true priority=critical {{ virtual_kernel_args_common }}'
