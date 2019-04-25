@@ -6,8 +6,8 @@ import errno
 from xml.etree import ElementTree
 from subprocess import Popen, PIPE
 
-KERNEL_PATH = '/var/opt/kernel'
-VIRT_GET_KERNEL = '/usr/bin/virt-get-kernel'
+KERNEL_PATH = '{{ virtual_kernel_base_path }}'
+VIRT_GET_KERNEL = 'virt-get-kernel'
 
 def main():
     if len(sys.argv) != 5:
