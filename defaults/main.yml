@@ -5,7 +5,6 @@ virtual_post_bootstrap_remove_purge: True
 virtual_post_bootstrap_remove_autoremove: True
 virtual_qemu_hook_create: True
 virtual_template_create: True
-virtual_template_remove: False
 
 # Minimal required variables to be set in the inventory
 # -----------------------------------------------------
