@@ -11,6 +11,14 @@
   include_tasks: clone-disks.yml
   when: virtual_bootstrap_method == 'clone'
 
+- name: include bootstrap disks
+  include_tasks: bootstrap-disks.yml
+  when: virtual_bootstrap_method == 'bootstrap'
+
+- name: include modify disks
+  include_tasks: modify-disks.yml
+  when: virtual_bootstrap_method == 'clone' or virtual_bootstrap_method == 'bootstrap'
+
 - name: include extra disks
   include_tasks: create-extra-disks.yml
   when: virtual_disks
@@ -25,7 +33,7 @@
       path: '{{ virtual_mount_path }}'
       state: absent
 
-  when: virtual_bootstrap_method == 'clone'
+  when: virtual_bootstrap_method == 'clone' or virtual_bootstrap_method == 'bootstrap'
 
 - name: include host boot
   include_tasks: host-boot.yml

@@ -90,6 +90,9 @@ virtual_template_command: >-
   {{ virtual_distribution }} {{ virtual_codename }} -y
   {{ ' '.join(['-b', virtual_disk_size_boot]) if virtual_boot_method == 'part' else '' }}
   {{ '-f' if virtual_template_type == 'file' else '' }}
+virtual_bootstrap_command: >-
+  bootstrap {{ virtual_guest_name }} {{ virtual_disk_vg }} {{ virtual_distribution }} {{ virtual_codename }} -y
+  {{ ' '.join(['-b', virtual_disk_size_boot]) if virtual_boot_method == 'part' else '' }}
 
 # Default variables method install (may be overridden in the inventory)
 # ---------------------------------------------------------------------

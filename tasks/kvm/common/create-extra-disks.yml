@@ -18,4 +18,4 @@
 
 - name: include fill extra disks
   include_tasks: fill-extra-disks.yml
-  when: virtual_bootstrap_method == 'clone'
+  when: virtual_bootstrap_method == 'clone' or virtual_bootstrap_method == 'bootstrap'

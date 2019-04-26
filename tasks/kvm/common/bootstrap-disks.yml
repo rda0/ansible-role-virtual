@@ -1,0 +1,5 @@
+---
+- name: bootstrap disks
+  command: '{{ virtual_bootstrap_command }}'
+  args:
+    creates: '/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root'

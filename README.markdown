@@ -10,6 +10,18 @@ The following hypervisors are currently supported:
 
 - `kvm`: QEMU-KVM
 
+Requirements
+------------
+
+The methods `clone` and `bootstrap` require a bootstrap command to create guest images. By default the bootstrap command is configured to use [bootstrap](https://github.com/rda0/bootstrap), which should work out of the box with the role defaults.
+
+Run the followin commands on the hypervisor to install it:
+
+```bash
+git clone https://github.com/rda0/bootstrap.git /opt/bootstrap
+ln -s /opt/bootstrap/bootstrap /usr/local/bin/bootstrap
+```
+
 Playbook
 --------
 
@@ -36,15 +48,16 @@ Bootstrap methods
 
 Set using `virtual_bootstrap_method`.
 
-- `clone`: clone vm from template disk image, **preferred method for production**
-- `install`: install vm using the installer
+- `clone`: clone guest from template disk image, **preferred method for production**
+- `bootstrap`: same as clone, but bootstraps guest lvs directly (slower)
+- `install`: install guest using the installer
 
 Boot method options
 -------------------
 
 Set using `virtual_boot_method`
 
-### method clone
+### method clone and bootstrap
 
 - `fs`: clone vm from a template disk image `root` (bootloader: extlinux), **preferred method for production**
 - `host`: clone vm from a template disk image `root` and boots using host boot method (kernel extracted from vm fs)

@@ -1,8 +1,4 @@
 ---
-- name: set fact virtual_mount_path
-  set_fact:
-    virtual_mount_path: "{{ virtual_mount_base_path }}/{{ virtual_guest_name }}_{{ 1000000 | random | hash('sha1') }}"
-
 - name: create template
   command: '{{ virtual_template_command }}'
   args:
@@ -12,25 +8,3 @@
 - name: "clone disks ({{ ', '.join(virtual_disks_main) }}) from template"
   command: 'dd if={{ virtual_template_base }}-{{ item }} of=/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-{{ item }} bs=1M'
   loop: '{{ virtual_disks_main }}'
-
-- name: check root filesystem
-  command: 'e2fsck -pf /dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root'
-
-- name: change root filesystem uuid
-  shell: 'echo y | tune2fs /dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root -U random'
-
-- name: resize root filesystem
-  command: 'resize2fs /dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root'
-
-- name: create root mount dir
-  file:
-    path: '{{ virtual_mount_path }}/root'
-    state: directory
-
-- name: mount root filesystem
-  command: 'mount /dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root {{ virtual_mount_path }}/root'
-  args:
-    warn: false
-
-- name: set hostname
-  shell: 'echo "{{ virtual_guest_name }}" > {{ virtual_mount_path }}/root/etc/hostname'
