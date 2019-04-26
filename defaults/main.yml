@@ -4,6 +4,8 @@ virtual_post_bootstrap_remove_packages: ['haveged']
 virtual_post_bootstrap_remove_purge: True
 virtual_post_bootstrap_remove_autoremove: True
 virtual_qemu_hook_create: True
+virtual_template_create: True
+virtual_template_remove: False
 
 # Minimal required variables to be set in the inventory
 # -----------------------------------------------------
@@ -83,6 +85,12 @@ virtual_numa_cell_memory: '{{ virtual_memory*1024 | int | abs }}'
 virtual_disk_boot_index: "{{ 1 if virtual_boot_method == 'part' else 0 }}"
 virtual_disks_letters_skip: '{{ virtual_disk_boot_index|int + 1 }}'
 virtual_disks_letters: "{{ virtual_disk_letters[virtual_disks_letters_skip|int:] if virtual_boot_method == 'part' else virtual_disk_letters[virtual_disks_letters_skip|int:] }}"
+virtual_template_command: >-
+  bootstrap {{ virtual_template_name_prefix }}-{{ virtual_boot_method }}-{{ virtual_codename }}
+  {{ virtual_template_path if virtual_template_type == 'file' else virtual_template_vg }}
+  {{ virtual_distribution }} {{ virtual_codename }} -y
+  {{ ' '.join(['-b', virtual_disk_size_boot]) if virtual_boot_method == 'part' else '' }}
+  {{ '-f' if virtual_template_type == 'file' else '' }}
 
 # Default variables method install (may be overridden in the inventory)
 # ---------------------------------------------------------------------
