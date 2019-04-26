@@ -17,7 +17,7 @@
   when: virtual_boot_method == 'preseed'
 
 - name: include bootstrap
-  include_tasks: '{{ virtual_hypervisor_type }}/bootstrap.yml'
+  include_tasks: bootstrap.yml
 
 - name: wait until guest is shut off
   command: virsh domstate {{ virtual_guest_name }}

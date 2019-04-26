@@ -27,5 +27,5 @@
   when: virtual_template_method == 'clone'
 
 - name: include host boot
-  include_tasks: create-host-boot.yml
+  include_tasks: host-boot.yml
   when: virtual_boot_method == 'host'

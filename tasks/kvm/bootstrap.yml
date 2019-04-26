@@ -1,7 +1,4 @@
 ---
-#- name: 'set vm vars for ({{ virtual_distribution }}/{{ virtual_codename }})'
-#  include_vars: "{{ virtual_distribution }}/{{ virtual_codename }}/vm.yml"
-
 - name: check if '/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root' exists
   stat:
     path: '/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root'
@@ -13,9 +10,9 @@
   register: virtual_guest_xml_stat
 
 - name: include create disks
-  include_tasks: '{{ virtual_hypervisor_type }}/create-disks.yml'
+  include_tasks: common/create-disks.yml
   when: not (virtual_disk_root_stat.stat.exists is defined and virtual_disk_root_stat.stat.exists == True)
 
 - name: include define guest
-  include_tasks: '{{ virtual_hypervisor_type }}/define-guest.yml'
+  include_tasks: common/define-guest.yml
   when: not (virtual_guest_xml_stat.stat.exists is defined and virtual_guest_xml_stat.stat.exists == True)
