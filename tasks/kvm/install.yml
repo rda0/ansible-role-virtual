@@ -1,1 +1,30 @@
-create.yml
+---
+- name: set preseed vars for ({{ virtual_distribution }}/{{ virtual_codename }})
+  include_vars: "{{ virtual_distribution }}/{{ virtual_codename }}/preseed.yml"
+
+- block:
+
+  - name: create preseed base path
+    file:
+      path: '{{ virtual_preseed_base_path }}'
+      state: directory
+
+  - name: create preseed file
+    template:
+      src: '{{ virtual_preseed_template_type }}/{{ virtual_preseed_filename }}'
+      dest: '{{ virtual_preseed_path }}'
+
+  when: virtual_boot_method == 'preseed'
+
+- name: include bootstrap
+  include_tasks: '{{ virtual_hypervisor_type }}/bootstrap.yml'
+
+- name: wait until guest is shut off
+  command: virsh domstate {{ virtual_guest_name }}
+  register: result
+  until: result.stdout.find("shut off") != -1
+  retries: 1000
+  delay: 10
+
+- name: start guest
+  command: virsh start {{ virtual_guest_name }}

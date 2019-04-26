@@ -1,10 +1,4 @@
 ---
-- name: create root lv
-  lvol:
-    vg: '{{ virtual_disk_vg }}'
-    lv: '{{ virtual_guest_name }}-root'
-    size: "{{ virtual_disk_size_root }}"
-
 - name: launch vm
   command: |
     virt-install \

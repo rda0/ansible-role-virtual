@@ -1,5 +1,8 @@
 include_virtual_bootstrap: True
-
+virtual_post_bootstrap_timeout: 900
+virtual_post_bootstrap_remove_packages: ['haveged']
+virtual_post_bootstrap_remove_purge: True
+virtual_post_bootstrap_remove_autoremove: True
 virtual_qemu_hook_create: True
 
 # Minimal required variables to be set in the inventory
@@ -26,6 +29,13 @@ virtual_template_vg: vg0
 virtual_template_path: /var/opt/img
 virtual_template_type: file
 virtual_template_name_prefix: tpl
+virtual_os_variant: generic
+virtual_arch: amd64
+virtual_mirrors:
+  debian: http://debian.ethz.ch/debian
+  ubuntu: http://ubuntu.ethz.ch/ubuntu
+  kali: http://http.kali.org
+virtual_mirror: '{{ virtual_mirrors[virtual_distribution] }}'
 virtual_cpus: 1
 virtual_cpus_max: '{{ virtual_cpus }}'
 virtual_memory: 1024
@@ -53,11 +63,11 @@ virtual_kernel_disk_path: '/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-{
 virtual_kernel_args_common: 'net.ifnames=0 biosdevname=0 nousb console=tty0 console=ttyS0,115200n8 elevator=noop'
 virtual_kernel_args_root: '/dev/sda'
 virtual_kernel_args: 'root={{ virtual_kernel_args_root }} ro {{ virtual_kernel_args_common }}'
-virtual_install_kernel_args: 'auto=true priority=critical {{ virtual_kernel_args_common }}'
 
 # Conditional variables (only override if you know what you are doing)
 # --------------------------------------------------------------------
 
+virtual_template_method: "{{ 'clone' if virtual_bootstrap_method == 'create' else 'none' }}"
 virtual_template_prefix:
   file: '{{ virtual_template_path }}'
   lv: '/dev/{{ virtual_template_vg }}'
@@ -74,3 +84,47 @@ virtual_numa_cell_memory: '{{ virtual_memory*1024 | int | abs }}'
 virtual_disk_boot_index: "{{ 1 if virtual_boot_method == 'part' else 0 }}"
 virtual_disks_letters_skip: '{{ virtual_disk_boot_index|int + 1 }}'
 virtual_disks_letters: "{{ virtual_disk_letters[virtual_disks_letters_skip|int:] if virtual_boot_method == 'part' else virtual_disk_letters[virtual_disks_letters_skip|int:] }}"
+
+# Default variables method install (may be overridden in the inventory)
+# ---------------------------------------------------------------------
+
+virtual_locations:
+  mirror: '{{ virtual_mirror }}/dists/{{ virtual_codename }}/main/installer-{{ virtual_arch }}/'
+  debian_daily: 'http://d-i.debian.org/daily-images/{{ virtual_arch }}/'
+virtual_install_from: mirror
+virtual_preseed_base_path: /var/opt/preseed
+virtual_preseed_filename: preseed.cfg
+virtual_preseed_path: '{{ virtual_preseed_base_path }}/{{ virtual_guest_name }}-{{ virtual_preseed_filename }}'
+virtual_preseed_di:
+  country: CH
+  language: en
+  locale: en_US.UTF-8
+  layoutcode: us
+virtual_preseed_authorized_keys: ''
+virtual_preseed_late_command: >-
+  mkdir -m 0700 -p /target/root/.ssh;
+  echo '{{ virtual_preseed_authorized_keys }}' > /target/root/.ssh/authorized_keys;
+  chmod 0600 /target/root/.ssh/authorized_keys;
+  sync
+virtual_install_kernel_args_common: 'serial-console vga=off fb=false'
+
+# Conditional variables for method install (only override if you know what you are doing)
+# ---------------------------------------------------------------------------------------
+
+virtual_location: '{{ virtual_locations[virtual_install_from] }}'
+virtual_preseed_args: >-
+  debian-installer/country={{ virtual_preseed_di['country'] }}
+  debian-installer/language={{ virtual_preseed_di['language'] }}
+  debian-installer/locale={{ virtual_preseed_di['locale'] }}
+  keyboard-configuration/layoutcode={{ virtual_preseed_di['layoutcode'] }}
+  file=/{{ virtual_guest_name }}-{{ virtual_preseed_filename }}
+virtual_preseed_template_type: '{{ virtual_distribution }}'
+virtual_install_kernel_args_auto: "{{ 'auto=true' if virtual_boot_method == 'preseed' else '' }}"
+virtual_install_kernel_args_priority: "priority={{ 'critical' if virtual_boot_method == 'preseed' else 'low' }}"
+virtual_install_kernel_args_preseed: "{{ virtual_preseed_args if virtual_boot_method == 'preseed' else '' }}"
+virtual_install_kernel_args: >-
+  {{ virtual_install_kernel_args_auto }}
+  {{ virtual_install_kernel_args_priority }}
+  {{ virtual_install_kernel_args_common }}
+  {{ virtual_kernel_args_common }}
+  {{ virtual_install_kernel_args_preseed }}

@@ -32,9 +32,17 @@
     {% for disk in virtual_disks|default([]) %}
     --disk=path=/dev/{{ (disk.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ disk.mount|default('/dev/sd' + virtual_disks_letters[loop.index - 1])|replace('/', '-') }},bus=scsi,cache=none,address.type=drive,address.controller=0,address.bus=0,address.target={{ loop.index + virtual_disk_boot_index|int }},address.unit={{ loop.index + virtual_disk_boot_index|int }} \
     {% endfor %}
+    {% if virtual_bootstrap_method != 'install' %}
     --import \
+    {% else %}
+    --location={{ virtual_location }} \
+    --extra-args='{{ virtual_install_kernel_args }}' \
+    {% endif %}
+    {% if virtual_boot_method == 'preseed' %}
+    --initrd-inject={{ virtual_preseed_path }}
+    {% endif %}
     --os-type=linux \
-    --os-variant={{ os_variant }} \
+    --os-variant={{ virtual_os_variant }} \
     --console=pty,target_type=serial \
     {% if virtual_boot_method == 'host' %}
     --boot=kernel={{ virtual_kernel_base_path }}/{{ virtual_guest_name }}/vmlinuz,initrd={{ virtual_kernel_base_path }}/{{ virtual_guest_name }}/initrd.img,kernel_args="{{ virtual_kernel_args }}" \
