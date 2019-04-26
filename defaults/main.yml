@@ -23,7 +23,7 @@ virtual_qemu_hook_create: True
 # ------------------------------------------------------
 
 virtual_guest_name: '{{ inventory_hostname }}'
-virtual_bootstrap_method: create
+virtual_bootstrap_method: clone
 virtual_boot_method: fs
 virtual_template_vg: vg0
 virtual_template_path: /var/opt/img
@@ -67,7 +67,6 @@ virtual_kernel_args: 'root={{ virtual_kernel_args_root }} ro {{ virtual_kernel_a
 # Conditional variables (only override if you know what you are doing)
 # --------------------------------------------------------------------
 
-virtual_template_method: "{{ 'clone' if virtual_bootstrap_method == 'create' else 'none' }}"
 virtual_template_prefix:
   file: '{{ virtual_template_path }}'
   lv: '/dev/{{ virtual_template_vg }}'

@@ -36,7 +36,7 @@ Bootstrap methods
 
 Set using `virtual_bootstrap_method`.
 
-- `create`: create vm from template disk image, **preferred method for production**
+- `clone`: clone vm from template disk image, **preferred method for production**
 - `install`: install vm using the installer
 
 Boot method options
@@ -44,11 +44,11 @@ Boot method options
 
 Set using `virtual_boot_method`
 
-### method create
+### method clone
 
-- `fs`: create vm from a template disk image `root` (bootloader: extlinux), **preferred method for production**
-- `host`: create vm from a template disk image `root` and boots using host boot method (kernel extracted from vm fs)
-- `part`: create vm from 2 template disk images `boot` and `root` (bootloader: grub)
+- `fs`: clone vm from a template disk image `root` (bootloader: extlinux), **preferred method for production**
+- `host`: clone vm from a template disk image `root` and boots using host boot method (kernel extracted from vm fs)
+- `part`: clone vm from 2 template disk images `boot` and `root` (bootloader: grub)
 
 ### method install
 
@@ -89,7 +89,7 @@ Edit the playbooks variables `virtual_guest_name`, `virtual_mac` and any other v
   vars:
     - virtual_hypervisor_host: my-kvm-hypervisor
     - virtual_hypervisor_type: kvm
-    - virtual_bootstrap_method: create
+    - virtual_bootstrap_method: clone
     - virtual_boot_method: fs
     - virtual_distribution: debian
     - virtual_codename: stretch
@@ -134,7 +134,7 @@ To create additional lvs to be used as mount points, use the `virtual_disks` dic
   vars:
     - virtual_hypervisor_host: my-kvm-hypervisor
     - virtual_hypervisor_type: kvm
-    - virtual_bootstrap_method: create
+    - virtual_bootstrap_method: clone
     - virtual_boot_method: fs
     - virtual_distribution: debian
     - virtual_codename: jessie

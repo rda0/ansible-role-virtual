@@ -10,9 +10,9 @@
   register: virtual_guest_xml_stat
 
 - name: include create disks
-  include_tasks: common/create-disks.yml
+  include_tasks: create-disks.yml
   when: not (virtual_disk_root_stat.stat.exists is defined and virtual_disk_root_stat.stat.exists == True)
 
 - name: include define guest
-  include_tasks: common/define-guest.yml
+  include_tasks: define-guest.yml
   when: not (virtual_guest_xml_stat.stat.exists is defined and virtual_guest_xml_stat.stat.exists == True)

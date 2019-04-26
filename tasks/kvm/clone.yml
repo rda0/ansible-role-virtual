@@ -1,0 +1,4 @@
+---
+- name: include check
+  include_tasks: common/check.yml
+
