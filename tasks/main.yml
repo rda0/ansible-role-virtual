@@ -16,6 +16,7 @@
 
   - name: gather facts
     setup:
+    tags: always
 
   - name: "post bootstrap remove packages ({{ ', '.join(virtual_post_bootstrap_remove_packages) }})"
     package:
