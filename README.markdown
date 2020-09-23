@@ -37,12 +37,6 @@ When including this role, disable facts gathering in the playbook. This is requi
 
 This role (`virtual`) will gather facts just after the virtual host becomes ready, so the facts are available for any following roles.
 
-The playbook needs to be started with `host_key_checking=False` until there is a better solution in ansible:
-
-```sh
-ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook ...
-```
-
 Bootstrap methods
 -----------------
 
