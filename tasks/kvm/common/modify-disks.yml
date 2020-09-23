@@ -30,3 +30,11 @@
   loop_control:
     loop_var: ssh_host_key_type
   when: virtual_ssh_host_key_types and virtual_ssh_host_keys_public and virtual_ssh_host_keys_private
+
+- name: set root password hash
+  lineinfile:
+    path: '{{ virtual_mount_path }}/root/etc/shadow'
+    regexp: '^root:([^:])*(.*)$'
+    line: 'root:{{ virtual_root_password_hash }}\2'
+    backrefs: yes
+  no_log: true

@@ -84,8 +84,12 @@ Special variables:
 - `virtual_cpus_max`: if set to a larger value than `virtual_cpus`, cpu hotplugging will be enabled
 - `virtual_memory_max`: if set to a larger value than `virtual_memory`, memory hotplugging will be enabled
 - `virtual_memory_hugepages`: defaults to `True`, make sure enough free hugepages are available on the hypervisor
-- `virtual_ssh_host_keys_public`: defaults to `'{{ ssh_host_keys_public }}'`
-- `virtual_ssh_host_keys_private`: defaults to `'{{ vault_ssh_host_keys_private }}'`
+
+Required inventory variables (or override via `virtual_` variable):
+
+- `virtual_ssh_host_keys_public`: defaults to `ssh_host_keys_public`
+- `virtual_ssh_host_keys_private`: defaults to `vault_ssh_host_keys_private`
+- `virtual_root_password_hash`: defaults to `vault_root_password_hash`
 
 The ssh host keys must be pre-defined in the inventory (see above), otherwise set `host_key_checking=False`.
 

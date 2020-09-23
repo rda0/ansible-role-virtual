@@ -70,6 +70,7 @@ virtual_ssh_host_key_types:
   - ed25519
 virtual_ssh_host_keys_public: '{{ ssh_host_keys_public }}'
 virtual_ssh_host_keys_private: '{{ vault_ssh_host_keys_private }}'
+virtual_root_password_hash: '{{ vault_root_password_hash }}'
 
 # Conditional variables (only override if you know what you are doing)
 # --------------------------------------------------------------------
