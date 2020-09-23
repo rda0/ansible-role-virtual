@@ -1,6 +1,6 @@
 - name: copy public ssh host {{ ssh_host_key_type }} key
   copy:
-    content: "{{ ssh_host_keys_public[ssh_host_key_type] }}"
+    content: "{{ virtual_ssh_host_keys_public[ssh_host_key_type] }}"
     dest: "{{ virtual_mount_path }}/root/etc/ssh/ssh_host_{{ ssh_host_key_type }}_key.pub"
     owner: root
     group: root
@@ -8,7 +8,7 @@
 
 - name: copy private ssh host {{ ssh_host_key_type }} key
   copy:
-    content: "{{ vault_ssh_host_keys_private[ssh_host_key_type] }}"
+    content: "{{ virtual_ssh_host_keys_private[ssh_host_key_type] }}"
     dest: "{{ virtual_mount_path }}/root/etc/ssh/ssh_host_{{ ssh_host_key_type }}_key"
     owner: root
     group: root

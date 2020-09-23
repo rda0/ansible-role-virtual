@@ -26,9 +26,7 @@
   shell: 'echo "{{ virtual_guest_name }}" > {{ virtual_mount_path }}/root/etc/hostname'
 
 - include_tasks: copy_host_keys.yml
-  loop:
-   - rsa
-   - ecdsa
-   - ed25519
+  loop: '{{ virtual_ssh_host_key_types }}'
   loop_control:
     loop_var: ssh_host_key_type
+  when: virtual_ssh_host_key_types and virtual_ssh_host_keys_public and virtual_ssh_host_keys_private
