@@ -5,6 +5,7 @@
     owner: root
     group: root
     mode: 0644
+  no_log: true
 
 - name: copy private ssh host {{ ssh_host_key_type }} key
   copy:
@@ -13,3 +14,4 @@
     owner: root
     group: root
     mode: 0600
+  no_log: true
