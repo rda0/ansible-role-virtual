@@ -12,6 +12,7 @@ virt-install \
 --cpu={{ virtual_cpu }} \
 --memory={{ virtual_memory }} \
 {% endif %}
+--cputune={{ virtual_cputune }} \
 {% if virtual_cpus_hotpluggable %}
 --vcpus=vcpus={{ virtual_cpus }},maxvcpus={{ virtual_cpus_max }} \
 {% else %}

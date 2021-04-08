@@ -38,6 +38,7 @@ virtual_mirrors:
   kali: http://http.kali.org
 virtual_mirror: '{{ virtual_mirrors[virtual_distribution] }}'
 virtual_cpu: host-passthrough,cache.mode=passthrough
+virtual_cputune: clearxml=yes
 virtual_cpus: 1
 virtual_cpus_max: '{{ virtual_cpus }}'
 virtual_memory: 1024

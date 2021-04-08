@@ -15,6 +15,7 @@ if [ ! -f /etc/libvirt/qemu/{{ virtual_guest_name }}.xml ]; then
 virt-install \
 --virt-type=kvm \
 --cpu={{ virtual_cpu }} \
+--cputune={{ virtual_cputune }} \
 --name={{ virtual_guest_name }} \
 --vcpus={{ virtual_cpus }} \
 --memory={{ virtual_memory }} \
