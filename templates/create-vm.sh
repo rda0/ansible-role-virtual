@@ -17,7 +17,7 @@ virt-install \
 --cpu={{ virtual_cpu }} \
 --cputune={{ virtual_cputune }} \
 --name={{ virtual_guest_name }} \
---vcpus={{ virtual_cpus }} \
+--vcpus=vcpus={{ virtual_cpus }} \
 --memory={{ virtual_memory }} \
 --memorybacking=hugepages=yes \
 --memballoon=virtio \

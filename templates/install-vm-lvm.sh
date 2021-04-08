@@ -16,7 +16,7 @@ virt-install \
 {% if virtual_cpus_hotpluggable %}
 --vcpus=vcpus={{ virtual_cpus }},maxvcpus={{ virtual_cpus_max }} \
 {% else %}
---vcpus={{ virtual_cpus }} \
+--vcpus=vcpus={{ virtual_cpus }} \
 {% endif %}
 {% if virtual_memory_hugepages %}
 --memorybacking=hugepages=yes,size={{ virtual_memory_hugepages_size }},unit={{ virtual_memory_hugepages_unit }} \

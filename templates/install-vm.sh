@@ -5,7 +5,7 @@ if [ ! -f /etc/libvirt/qemu/{{ virtual_guest_name }}.xml ]; then
 virt-install \
 --virt-type=kvm \
 --name={{ virtual_guest_name }} \
---vcpus={{ virtual_cpus }} \
+--vcpus=vcpus={{ virtual_cpus }} \
 --memory={{ virtual_memory }} \
 --controller type=scsi,model=virtio-scsi \
 --disk=/var/lib/libvirt/images/{{ virtual_guest_name }}.qcow2,format=qcow2,size={{ virtual_disk_size_root }},bus=scsi,cache=none \
