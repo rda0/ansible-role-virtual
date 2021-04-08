@@ -116,7 +116,7 @@ Edit the playbooks variables `virtual_guest_name`, `virtual_mac` and any other v
     - virtual_disk_size_root: 10G
     - virtual_disk_vg: r10
     - virtual_bridge: br0
-    - virtual_mac: 52:54:00:7a:3b:8f
+    - virtual_mac: '52:54:00:7a:3b:8f'
   roles:
     - virtual
 ```
@@ -163,7 +163,7 @@ To create additional lvs to be used as mount points, use the `virtual_disks` dic
     - virtual_disk_vg: vg0
     - virtual_disk_fs: ext3
     - virtual_bridge: br0
-    - virtual_mac: 52:54:00:7a:3b:8f
+    - virtual_mac: '52:54:00:7a:3b:8f'
     - virtual_disks:
         - mount: /var
           size: 2G
