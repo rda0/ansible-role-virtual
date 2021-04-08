@@ -37,6 +37,7 @@ virtual_mirrors:
   ubuntu: http://ubuntu.ethz.ch/ubuntu
   kali: http://http.kali.org
 virtual_mirror: '{{ virtual_mirrors[virtual_distribution] }}'
+virtual_cpu: host-passthrough,cache.mode=passthrough
 virtual_cpus: 1
 virtual_cpus_max: '{{ virtual_cpus }}'
 virtual_memory: 1024
