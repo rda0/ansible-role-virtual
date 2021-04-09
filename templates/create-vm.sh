@@ -1,14 +1,14 @@
 #!/bin/bash
 
-if [ -e /dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root ]; then
+if [ -e {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root ]; then
     echo "lv already exists!"
     exit 1
 fi
 
 lvcreate -L {{ disk }} -n {{ virtual_guest_name }}-root {{ virtual_disk_vg }}
-dd if=/dev/{{ virtual_template_vg }}/vm-template of=/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root bs=1M
-e2fsck -f /dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root
-resize2fs /dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root
+dd if={{ virtual_disk_prefix }}{{ virtual_template_vg }}/vm-template of={{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root bs=1M
+e2fsck -f {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root
+resize2fs {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root
 
 if [ ! -f /etc/libvirt/qemu/{{ virtual_guest_name }}.xml ]; then
 
@@ -22,11 +22,11 @@ virt-install \
 --memorybacking=hugepages=yes \
 --memballoon=virtio \
 --controller=type=scsi,model=virtio-scsi \
---disk=path=/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root,bus=scsi,cache=none \
+--disk=path={{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root,bus=scsi,cache=none \
 --os-type=linux \
 --os-variant={{ os_variant }} \
 --console=pty,target_type=serial \
---boot=kernel=/vmlinuz,initrd=/initrd.img,kernel_args="root=/dev/sda elevator=noop net.ifnames=0 biosdevname=0 nousb console=tty0 console=ttyS0,115200 serial" \
+--boot=kernel=/vmlinuz,initrd=/initrd.img,kernel_args="root={{ virtual_disk_prefix }}sda elevator=noop net.ifnames=0 biosdevname=0 nousb console=tty0 console=ttyS0,115200 serial" \
 {% if virtual_mac is defined %}
 --network=bridge={{ virtual_bridge }},model=virtio,mac={{ virtual_mac }} \
 {% else %}

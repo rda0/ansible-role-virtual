@@ -51,6 +51,7 @@ virtual_memory_hugepages_size: 2048
 virtual_memory_hugepages_unit: KiB
 virtual_disk_size_root: 2G
 virtual_disk_size_boot: 512M
+virtual_disk_type: lv
 virtual_disk_vg: vg0
 virtual_disk_fs: ext4
 virtual_disk_mount_options: noatime,nodiratime
@@ -63,7 +64,7 @@ virtual_interface_name: "{{ virtual_guest_name | regex_replace(virtual_interface
 virtual_mount_base_path: /mnt/ansible/virtual
 virtual_kernel_base_path: /var/opt/kernel
 virtual_kernel_disk: root
-virtual_kernel_disk_path: '/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-{{ virtual_kernel_disk }}'
+virtual_kernel_disk_path: '{{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-{{ virtual_kernel_disk }}'
 virtual_kernel_args_common: 'net.ifnames=0 biosdevname=0 nousb console=tty0 console=ttyS0,115200n8 elevator=noop'
 virtual_kernel_args_root: '/dev/sda'
 virtual_kernel_args: 'root={{ virtual_kernel_args_root }} ro {{ virtual_kernel_args_common }}'
@@ -83,6 +84,10 @@ virtual_template_prefix:
   lv: '/dev/{{ virtual_template_vg }}'
 virtual_template_suffix: '{{ virtual_template_name_prefix }}-{{ virtual_boot_method }}-{{ virtual_codename }}'
 virtual_template_base: '{{ virtual_template_prefix[virtual_template_type] }}/{{ virtual_template_suffix }}'
+virtual_disk_prefixes:
+  lv: '/dev/'
+  file: ''
+virtual_disk_prefix: "{{ virtual_disk_prefixes[virtual_disk_type] }}"
 virtual_disks_main: "{{ ['root','boot'] if virtual_boot_method == 'part' else ['root'] }}"
 virtual_disks_main_size:
   root: '{{ virtual_disk_size_root }}'

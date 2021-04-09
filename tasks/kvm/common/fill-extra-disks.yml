@@ -6,11 +6,11 @@
   with_items: '{{ virtual_disks | selectattr("mount", "defined") | list }}'
 
 - name: add extra disks to fstab
-  shell: "echo '/dev/sd{{ virtual_disks_letters[item.0] }}  {{ item.1.mount }}  {{ (item.1.fs|default(virtual_disk_fs)) }} {{ (item.1.options|default(virtual_disk_mount_options)) }} 0 2' >> {{ virtual_mount_path }}/root/etc/fstab"
+  shell: "echo '{{ virtual_disk_prefix }}sd{{ virtual_disks_letters[item.0] }}  {{ item.1.mount }}  {{ (item.1.fs|default(virtual_disk_fs)) }} {{ (item.1.options|default(virtual_disk_mount_options)) }} 0 2' >> {{ virtual_mount_path }}/root/etc/fstab"
   with_indexed_items: '{{ virtual_disks | selectattr("mount", "defined") | list }}'
 
 - name: make extra disks filesystems
-  command: "mkfs.{{ (item.fs|default(virtual_disk_fs)) }} /dev/{{ (item.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.mount|replace('/', '-') }}"
+  command: "mkfs.{{ (item.fs|default(virtual_disk_fs)) }} {{ virtual_disk_prefix }}{{ (item.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.mount|replace('/', '-') }}"
   with_items: '{{ virtual_disks | selectattr("mount", "defined") | list }}'
 
 - name: create extra disks mount points in root filesystem
@@ -20,18 +20,18 @@
   with_items: '{{ virtual_disks | selectattr("mount", "defined") | list }}'
 
 - name: mount extra disks filesystems
-  command: "mount /dev/{{ (item.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.mount|replace('/', '-') }} {{ virtual_mount_path }}/{{ item.mount[1:]|replace('/', '-') }}"
+  command: "mount {{ virtual_disk_prefix }}{{ (item.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.mount|replace('/', '-') }} {{ virtual_mount_path }}/{{ item.mount[1:]|replace('/', '-') }}"
   args:
     warn: false
   with_items: '{{ virtual_disks | selectattr("mount", "defined") | list }}'
 
 - name: move files to separate disks
-  shell: "mv {{ virtual_mount_path }}/root{{ item.mount }}/* {{ virtual_mount_path }}/{{ item.mount[1:]|replace('/', '-') }}/; umount /dev/{{ (item.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.mount|replace('/', '-') }}; mount /dev/{{ (item.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.mount|replace('/', '-') }} {{ virtual_mount_path }}/root{{ item.mount }}"
+  shell: "mv {{ virtual_mount_path }}/root{{ item.mount }}/* {{ virtual_mount_path }}/{{ item.mount[1:]|replace('/', '-') }}/; umount {{ virtual_disk_prefix }}{{ (item.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.mount|replace('/', '-') }}; mount {{ virtual_disk_prefix }}{{ (item.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.mount|replace('/', '-') }} {{ virtual_mount_path }}/root{{ item.mount }}"
   args:
     warn: false
   ignore_errors: yes
   with_items: '{{ virtual_disks | selectattr("mount", "defined") | list }}'
 
 - name: umount extra disks filesystems
-  command: "umount /dev/{{ (item.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.mount|replace('/', '-') }}"
+  command: "umount {{ virtual_disk_prefix }}{{ (item.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.mount|replace('/', '-') }}"
   with_items: '{{ virtual_disks | selectattr("mount", "defined") | list | reverse | list }}'

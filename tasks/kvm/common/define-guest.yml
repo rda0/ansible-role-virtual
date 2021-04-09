@@ -27,11 +27,11 @@
     {% endif %}
     --controller=type=scsi,model=virtio-scsi \
     {% if virtual_boot_method == 'part' %}
-    --disk=path=/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-boot,bus=scsi,cache=none,address.type=drive,address.controller=0,address.bus=0,address.target=0,address.unit=0,boot_order=1 \
+    --disk=path={{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-boot,bus=scsi,cache=none,address.type=drive,address.controller=0,address.bus=0,address.target=0,address.unit=0,boot_order=1 \
     {% endif %}
-    --disk=path=/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root,bus=scsi,cache=none,address.type=drive,address.controller=0,address.bus=0,address.target={{ virtual_disk_boot_index }},address.unit={{ virtual_disk_boot_index }}{{ '' if virtual_boot_method == 'part' else ',boot_order=1' }} \
+    --disk=path={{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root,bus=scsi,cache=none,address.type=drive,address.controller=0,address.bus=0,address.target={{ virtual_disk_boot_index }},address.unit={{ virtual_disk_boot_index }}{{ '' if virtual_boot_method == 'part' else ',boot_order=1' }} \
     {% for disk in virtual_disks|default([]) %}
-    --disk=path=/dev/{{ (disk.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ disk.mount|default('/dev/sd' + virtual_disks_letters[loop.index - 1])|replace('/', '-') }},bus=scsi,cache=none,address.type=drive,address.controller=0,address.bus=0,address.target={{ loop.index + virtual_disk_boot_index|int }},address.unit={{ loop.index + virtual_disk_boot_index|int }} \
+    --disk=path={{ virtual_disk_prefix }}{{ (disk.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ disk.mount|default(virtual_disk_prefix + 'sd' + virtual_disks_letters[loop.index - 1])|replace('/', '-') }},bus=scsi,cache=none,address.type=drive,address.controller=0,address.bus=0,address.target={{ loop.index + virtual_disk_boot_index|int }},address.unit={{ loop.index + virtual_disk_boot_index|int }} \
     {% endfor %}
     {% if virtual_bootstrap_method != 'install' %}
     --import \

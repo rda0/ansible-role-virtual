@@ -26,7 +26,7 @@
 - block:
 
   - name: umount root filesystem
-    command: 'umount /dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root'
+    command: 'umount {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root'
 
   - name: remove mount dir
     file:

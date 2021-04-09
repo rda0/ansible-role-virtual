@@ -4,13 +4,13 @@
     virtual_mount_path: "{{ virtual_mount_base_path }}/{{ virtual_guest_name }}_{{ 1000000 | random | hash('sha1') }}"
 
 - name: check root filesystem
-  command: 'e2fsck -pf /dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root'
+  command: 'e2fsck -pf {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root'
 
 - name: change root filesystem uuid
-  shell: 'echo y | tune2fs /dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root -U random'
+  shell: 'echo y | tune2fs {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root -U random'
 
 - name: resize root filesystem
-  command: 'resize2fs /dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root'
+  command: 'resize2fs {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root'
 
 - name: create root mount dir
   file:
@@ -18,7 +18,7 @@
     state: directory
 
 - name: mount root filesystem
-  command: 'mount /dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root {{ virtual_mount_path }}/root'
+  command: 'mount {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root {{ virtual_mount_path }}/root'
   args:
     warn: false
 

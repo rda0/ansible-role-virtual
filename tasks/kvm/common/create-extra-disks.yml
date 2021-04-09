@@ -1,6 +1,6 @@
 ---
 - stat:
-    path: "/dev/{{ (item.1.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.1.mount|default('/dev/sd' + virtual_disks_letters[item.0])|replace('/', '-') }}"
+    path: "{{ virtual_disk_prefix }}{{ (item.1.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.1.mount|default('{{ virtual_disk_prefix }}sd' + virtual_disks_letters[item.0])|replace('/', '-') }}"
   register: virtual_disks_stat
   with_indexed_items: '{{ virtual_disks }}'
 
@@ -12,7 +12,7 @@
 - name: create extra disks lvs
   lvol:
     vg: '{{ (item.1.vg|default(virtual_disk_vg)) }}'
-    lv: "{{ virtual_guest_name }}{{ item.1.mount|default('/dev/sd' + virtual_disks_letters[item.0])|replace('/', '-') }}"
+    lv: "{{ virtual_guest_name }}{{ item.1.mount|default(virtual_disk_prefix + 'sd' + virtual_disks_letters[item.0])|replace('/', '-') }}"
     size: "{{ item.1.size }}"
   with_indexed_items: '{{ virtual_disks }}'
 

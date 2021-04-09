@@ -26,7 +26,7 @@ virt-install \
 --memballoon=none \
 {% endif %}
 --controller=type=scsi,model=virtio-scsi \
---disk=path=/dev/{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root,bus=scsi,cache=none \
+--disk=path={{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root,bus=scsi,cache=none \
 --location={{ location }} \
 --os-type=linux \
 --os-variant={{ os_variant }} \
