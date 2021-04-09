@@ -5,7 +5,12 @@
     lv: '{{ virtual_guest_name }}-{{ item }}'
     size: '{{ virtual_disks_main_size[item] }}'
   loop: '{{ virtual_disks_main }}'
-  when: virtual_bootstrap_method != 'bootstrap'
+  when: virtual_bootstrap_method != 'bootstrap' and virtual_disk_type == 'lv'
+
+- name: "create main disks ({{ ', '.join(virtual_disks_main) }}) file(s)"
+  command: 'fallocate -l {{ virtual_disks_main_size[item] }} {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-{{ item }}'
+  loop: '{{ virtual_disks_main }}'
+  when: virtual_bootstrap_method != 'bootstrap' and virtual_disk_type == 'file'
 
 - name: include clone disks
   include_tasks: clone-disks.yml
