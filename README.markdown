@@ -84,6 +84,10 @@ Special variables:
 - `virtual_cpus_max`: if set to a larger value than `virtual_cpus`, cpu hotplugging will be enabled
 - `virtual_memory_max`: if set to a larger value than `virtual_memory`, memory hotplugging will be enabled
 - `virtual_memory_hugepages`: defaults to `True`, make sure enough free hugepages are available on the hypervisor
+- `virtual_disk_type`: defaults to `lv`, use `file` for file based disk images
+- `virtual_disk_vg`: defaults to `vg0`, use the absolute file image pool path if `virtual_disk_type` is set to `file`
+- `virtual_disk_bus`: defaults to `scsi` (virtio-scsi), use `virtio` for virtio-blk
+- `virtual_disk_bus_id`: automatically set to `s` (scsi) or `v` (virtio). note: make sure bootloader is set correctly
 
 Required inventory variables (or override via `virtual_` variable):
 
