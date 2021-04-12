@@ -4,6 +4,9 @@
     virt-install \
     --name={{ virtual_guest_name }} \
     --virt-type=kvm \
+    {% if virtual_machine_type != '' %}
+    --machine={{ virtual_machine_type }} \
+    {% endif %}
     {% if virtual_memory_hotpluggable %}
     --cpu={{ virtual_cpu }},cell0.id=0,cell0.cpus={{ virtual_numa_cell_cpus }},cell0.memory={{ virtual_numa_cell_memory }} \
     --memory=memory={{ virtual_memory }},hotplugmemorymax={{ virtual_memory_max }},hotplugmemoryslots={{ virtual_memory_slots }} \

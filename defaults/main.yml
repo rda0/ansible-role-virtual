@@ -32,6 +32,7 @@ virtual_template_type: file
 virtual_template_name_prefix: tpl
 virtual_os_variant: generic
 virtual_arch: amd64
+virtual_machine_type: ''
 virtual_mirrors:
   debian: http://debian.ethz.ch/debian
   ubuntu: http://ubuntu.ethz.ch/ubuntu
