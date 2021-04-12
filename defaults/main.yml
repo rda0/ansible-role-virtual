@@ -54,6 +54,13 @@ virtual_disk_size_boot: 512M
 virtual_disk_type: lv
 virtual_disk_vg: vg0
 virtual_disk_fs: ext4
+virtual_disk_cache: none
+virtual_disk_io: native
+virtual_disk_bus: scsi
+virtual_disk_bus_ids:
+  scsi: s
+  virtio: v
+virtual_disk_bus_id: '{{ virtual_disk_bus_ids[virtual_disk_bus] }}'
 virtual_disk_mount_options: noatime,nodiratime
 virtual_disk_letters: 'abcdefghijklmnopqrstuvwxyz'
 virtual_disks: []

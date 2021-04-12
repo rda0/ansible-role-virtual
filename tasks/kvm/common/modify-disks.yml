@@ -22,6 +22,25 @@
   args:
     warn: false
 
+- name: check if we have syslinux
+  stat:
+    path: '{{ virtual_mount_path }}/root/syslinux.cfg'
+  register: virtual_guest_syslinux_stat
+
+- name: modify syslinux bus id
+  replace:
+    path: '{{ virtual_mount_path }}/root/syslinux.cfg'
+    regexp: '/dev/sd'
+    replace: '/dev/{{ virtual_disk_bus_id }}d'
+  when: virtual_disk_bus_id != 's' and virtual_guest_syslinux_stat.stat.exists
+
+- name: modify fstab bus id
+  replace:
+    path: '{{ virtual_mount_path }}/root/etc/fstab'
+    regexp: '/dev/sd'
+    replace: '/dev/{{ virtual_disk_bus_id }}d'
+  when: virtual_disk_bus_id != 's'
+
 - name: set hostname
   shell: 'echo "{{ virtual_guest_name }}" > {{ virtual_mount_path }}/root/etc/hostname'
 
