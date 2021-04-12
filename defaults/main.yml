@@ -53,6 +53,7 @@ virtual_memory_hugepages_unit: KiB
 virtual_disk_size_root: 2G
 virtual_disk_size_boot: 512M
 virtual_disk_type: lv
+virtual_disk_file_allocation: fallocate
 virtual_disk_vg: vg0
 virtual_disk_fs: ext4
 virtual_disk_cache: none

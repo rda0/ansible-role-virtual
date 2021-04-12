@@ -7,10 +7,15 @@
   loop: '{{ virtual_disks_main }}'
   when: virtual_bootstrap_method != 'bootstrap' and virtual_disk_type == 'lv'
 
-- name: "create main disks ({{ ', '.join(virtual_disks_main) }}) file(s)"
+- name: "create main disks ({{ ', '.join(virtual_disks_main) }}) file(s) (fallocate)"
   command: 'fallocate -l {{ virtual_disks_main_size[item] }} {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-{{ item }}'
   loop: '{{ virtual_disks_main }}'
-  when: virtual_bootstrap_method != 'bootstrap' and virtual_disk_type == 'file'
+  when: virtual_bootstrap_method != 'bootstrap' and virtual_disk_type == 'file' and virtual_disk_file_allocation == 'fallocate'
+
+- name: "create main disks ({{ ', '.join(virtual_disks_main) }}) file(s) (qemu-img)"
+  command: 'qemu-img create -f raw -o preallocation=full {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-{{ item }} {{ virtual_disks_main_size[item] }}'
+  loop: '{{ virtual_disks_main }}'
+  when: virtual_bootstrap_method != 'bootstrap' and virtual_disk_type == 'file' and virtual_disk_file_allocation == 'qemu-img'
 
 - name: include clone disks
   include_tasks: clone-disks.yml

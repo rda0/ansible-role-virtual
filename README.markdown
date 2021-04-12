@@ -88,6 +88,7 @@ Special variables:
 - `virtual_disk_vg`: defaults to `vg0`, use the absolute file image pool path if `virtual_disk_type` is set to `file`
 - `virtual_disk_bus`: defaults to `scsi` (virtio-scsi), use `virtio` for virtio-blk
 - `virtual_disk_bus_id`: automatically set to `s` (scsi) or `v` (virtio). note: make sure bootloader is set correctly
+- `virtual_disk_file_allocation`: `fallocate` (default) or `qemu-img`
 
 Required inventory variables (or override via `virtual_` variable):
 
