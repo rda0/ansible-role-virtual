@@ -95,6 +95,7 @@ virtual_template_suffix: '{{ virtual_template_name_prefix }}-{{ virtual_boot_met
 virtual_template_base: '{{ virtual_template_prefix[virtual_template_type] }}/{{ virtual_template_suffix }}'
 virtual_disk_prefixes:
   lv: '/dev/'
+  zvol: '/dev/'
   file: ''
 virtual_disk_prefix: "{{ virtual_disk_prefixes[virtual_disk_type] }}"
 virtual_disks_main: "{{ ['root','boot'] if virtual_boot_method == 'part' else ['root'] }}"
