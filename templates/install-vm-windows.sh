@@ -7,8 +7,10 @@ virt-install \
 --name={{ virtual_guest_name }} \
 --vcpus=vcpus={{ virtual_cpus }}{{ ',cpuset=' if virtual_cpuset != '' else '' }}{{ virtual_cpuset }} \
 --memory={{ virtual_memory }} \
+{% if virtual_disk_bus == 'scsi' %}
 --controller type=scsi,model=virtio-scsi \
---disk=/var/lib/libvirt/images/{{ virtual_guest_name }}.qcow2,format=qcow2,size={{ virtual_disk_size_root }},bus=scsi,cache=none \
+{% endif %}
+--disk=/var/lib/libvirt/images/{{ virtual_guest_name }}.qcow2,format=qcow2,size={{ virtual_disk_size_root }},bus={{ virtual_disk_bus }},cache=none \
 --cdrom={{ location }} \
 --os-type=windows \
 --os-variant={{ os_variant }} \

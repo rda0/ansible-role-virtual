@@ -21,8 +21,10 @@ virt-install \
 --memory={{ virtual_memory }} \
 --memorybacking=hugepages=yes \
 --memballoon=virtio \
+{% if virtual_disk_bus == 'scsi' %}
 --controller=type=scsi,model=virtio-scsi \
---disk=path={{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root,bus=scsi,cache=none \
+{% endif %}
+--disk=path={{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root,bus={{ virtual_disk_bus }},cache=none \
 --os-type=linux \
 --os-variant={{ os_variant }} \
 --console=pty,target_type=serial \
