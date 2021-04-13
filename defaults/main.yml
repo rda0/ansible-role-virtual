@@ -58,6 +58,7 @@ virtual_disk_vg: vg0
 virtual_disk_fs: ext4
 virtual_disk_cache: none
 virtual_disk_io: native
+virtual_disk_bs: 4k
 virtual_disk_bus: scsi
 virtual_disk_bus_ids:
   scsi: s
