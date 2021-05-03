@@ -24,6 +24,7 @@
     extra_zfs_properties:
       volsize: "{{ item.1.size }}"
       volblocksize: '{{ (item.1.bs|default(virtual_disk_bs)) }}'
+      # TODO: allow more props like compression
   with_indexed_items: '{{ virtual_disks }}'
   when: virtual_disk_type == 'zvol'
 

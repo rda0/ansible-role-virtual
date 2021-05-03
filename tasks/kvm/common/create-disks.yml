@@ -14,6 +14,7 @@
     extra_zfs_properties:
       volsize: '{{ virtual_disks_main_size[item] }}'
       volblocksize: '{{ virtual_disk_bs }}'
+      # TODO: allow more props like compression
   loop: '{{ virtual_disks_main }}'
   when: virtual_bootstrap_method != 'bootstrap' and virtual_disk_type == 'zvol'
 
