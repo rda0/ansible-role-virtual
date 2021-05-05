@@ -27,10 +27,12 @@ virtual_guest_name: '{{ inventory_hostname }}'
 virtual_bootstrap_method: clone
 virtual_boot_method: fs
 virtual_base_path: /var/virtual
+virtual_file_extension: ''
 virtual_template_vg: vg0
 virtual_template_path: '{{ virtual_base_path }}/images'
 virtual_template_type: file
 virtual_template_name_prefix: tpl
+virtual_template_file_extension: '{{ virtual_file_extension }}'
 virtual_os_variant: generic
 virtual_arch: amd64
 virtual_machine_type: ''
@@ -55,6 +57,7 @@ virtual_disk_size_root: 2G
 virtual_disk_size_boot: 512M
 virtual_disk_type: lv
 virtual_disk_file_allocation: fallocate
+virtual_disk_file_extension: '{{ virtual_file_extension }}'
 virtual_disk_vg: "{{ virtual_template_path if virtual_disk_type == 'file' else 'vg0'}}"
 virtual_disk_fs: ext4
 virtual_disk_cache: none
@@ -73,12 +76,6 @@ virtual_interface_suffix: ''
 virtual_interface_replace_regex: '^phd-(test-)?'
 virtual_interface_name: "{{ virtual_guest_name | regex_replace(virtual_interface_replace_regex, '') }}{{ virtual_interface_suffix }}"
 virtual_mount_base_path: /mnt/ansible/virtual
-virtual_kernel_base_path: '{{ virtual_base_path }}/kernel'
-virtual_kernel_disk: root
-virtual_kernel_disk_path: '{{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-{{ virtual_kernel_disk }}'
-virtual_kernel_args_common: 'net.ifnames=0 biosdevname=0 nousb console=tty0 console=ttyS0,115200n8 elevator=noop'
-virtual_kernel_args_root: '/dev/sda'
-virtual_kernel_args: 'root={{ virtual_kernel_args_root }} ro {{ virtual_kernel_args_common }}'
 virtual_ssh_host_key_types:
   - rsa
   - ecdsa
@@ -100,6 +97,7 @@ virtual_disk_prefixes:
   zvol: '/dev/'
   file: ''
 virtual_disk_prefix: "{{ virtual_disk_prefixes[virtual_disk_type] }}"
+virtual_disk_suffix: "{% if virtual_disk_type == 'file' %}{{ virtual_disk_file_extension }}{% endif %}"
 virtual_disks_main: "{{ ['root','boot'] if virtual_boot_method == 'part' else ['root'] }}"
 virtual_disks_main_size:
   root: '{{ virtual_disk_size_root }}'
@@ -117,11 +115,19 @@ virtual_template_command: >-
   {{ virtual_distribution }} {{ virtual_codename }} -y
   {{ ' '.join(['-b', virtual_disk_size_boot]) if virtual_boot_method == 'part' else '' }}
   {{ '-f' if virtual_template_type == 'file' else '' }}
+  {% if virtual_template_type == 'file' %}{% if virtual_template_file_extension != '' %}--file-extension {{ virtual_template_file_extension }}{% endif %}{% endif %}
 virtual_bootstrap_command: >-
   bootstrap {{ virtual_guest_name }} {{ virtual_disk_vg }} {{ virtual_distribution }} {{ virtual_codename }} -y
   -r {{ virtual_disk_size_root }}
   {{ ' '.join(['-b', virtual_disk_size_boot]) if virtual_boot_method == 'part' else '' }}
   {{ '-f' if virtual_disk_type == 'file' else '' }}
+  {% if virtual_disk_type == 'file' %}{% if virtual_disk_file_extension != '' %}--file-extension {{ virtual_disk_file_extension }}{% endif %}{% endif %}
+virtual_kernel_base_path: '{{ virtual_base_path }}/kernel'
+virtual_kernel_disk: root
+virtual_kernel_disk_path: '{{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-{{ virtual_kernel_disk }}{{ virtual_disk_suffix }}'
+virtual_kernel_args_common: 'net.ifnames=0 biosdevname=0 nousb console=tty0 console=ttyS0,115200n8 elevator=noop'
+virtual_kernel_args_root: '/dev/sda'
+virtual_kernel_args: 'root={{ virtual_kernel_args_root }} ro {{ virtual_kernel_args_common }}'
 
 # Default variables method install (may be overridden in the inventory)
 # ---------------------------------------------------------------------

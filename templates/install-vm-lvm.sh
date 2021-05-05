@@ -28,7 +28,7 @@ virt-install \
 {% if virtual_disk_bus == 'scsi' %}
 --controller=type=scsi,model=virtio-scsi \
 {% endif %}
---disk=path={{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root,bus={{ virtual_disk_bus }},cache=none \
+--disk=path={{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root{{ virtual_disk_suffix }},bus={{ virtual_disk_bus }},cache=none \
 --location={{ location }} \
 --os-type=linux \
 --os-variant={{ os_variant }} \
