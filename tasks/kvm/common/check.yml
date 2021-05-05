@@ -9,6 +9,14 @@
     path: '/etc/libvirt/qemu/{{ virtual_guest_name }}.xml'
   register: virtual_guest_xml_stat
 
+- name: create virtual base path
+  file:
+    path: '{{ virtual_base_path }}'
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
 - name: include create disks
   include_tasks: create-disks.yml
   when: not (virtual_disk_root_stat.stat.exists is defined and virtual_disk_root_stat.stat.exists == True)

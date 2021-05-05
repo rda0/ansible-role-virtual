@@ -26,8 +26,9 @@ virtual_template_create: True
 virtual_guest_name: '{{ inventory_hostname }}'
 virtual_bootstrap_method: clone
 virtual_boot_method: fs
+virtual_base_path: /var/virtual
 virtual_template_vg: vg0
-virtual_template_path: /var/opt/img
+virtual_template_path: '{{ virtual_base_path }}/images'
 virtual_template_type: file
 virtual_template_name_prefix: tpl
 virtual_os_variant: generic
@@ -54,7 +55,7 @@ virtual_disk_size_root: 2G
 virtual_disk_size_boot: 512M
 virtual_disk_type: lv
 virtual_disk_file_allocation: fallocate
-virtual_disk_vg: vg0
+virtual_disk_vg: "{{ virtual_template_path if virtual_disk_type == 'file' else 'vg0'}}"
 virtual_disk_fs: ext4
 virtual_disk_cache: none
 virtual_disk_io: native
@@ -72,7 +73,7 @@ virtual_interface_suffix: ''
 virtual_interface_replace_regex: '^phd-(test-)?'
 virtual_interface_name: "{{ virtual_guest_name | regex_replace(virtual_interface_replace_regex, '') }}{{ virtual_interface_suffix }}"
 virtual_mount_base_path: /mnt/ansible/virtual
-virtual_kernel_base_path: /var/opt/kernel
+virtual_kernel_base_path: '{{ virtual_base_path }}/kernel'
 virtual_kernel_disk: root
 virtual_kernel_disk_path: '{{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-{{ virtual_kernel_disk }}'
 virtual_kernel_args_common: 'net.ifnames=0 biosdevname=0 nousb console=tty0 console=ttyS0,115200n8 elevator=noop'
@@ -129,7 +130,7 @@ virtual_locations:
   mirror: '{{ virtual_mirror }}/dists/{{ virtual_codename }}/main/installer-{{ virtual_arch }}/'
   debian_daily: 'http://d-i.debian.org/daily-images/{{ virtual_arch }}/'
 virtual_install_from: mirror
-virtual_preseed_base_path: /var/opt/preseed
+virtual_preseed_base_path: '{{ virtual_base_path }}/preseed'
 virtual_preseed_filename: preseed.cfg
 virtual_preseed_path: '{{ virtual_preseed_base_path }}/{{ virtual_guest_name }}-{{ virtual_preseed_filename }}'
 virtual_preseed_di:

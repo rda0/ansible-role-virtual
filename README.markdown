@@ -85,7 +85,7 @@ Special variables:
 - `virtual_memory_max`: if set to a larger value than `virtual_memory`, memory hotplugging will be enabled
 - `virtual_memory_hugepages`: defaults to `True`, make sure enough free hugepages are available on the hypervisor
 - `virtual_disk_type`: defaults to `lv`, use `zvol` for zfs volumes or `file` for file based disk images
-- `virtual_disk_vg`: defaults to `vg0`, use the absolute file image pool path if `virtual_disk_type` is set to `file`
+- `virtual_disk_vg`: defaults to `vg0`, use(s by default) the absolute file image pool path (default: `/var/virtual/images`) if `virtual_disk_type` is set to `file`
 - `virtual_disk_bus`: defaults to `scsi` (virtio-scsi), use `virtio` for virtio-blk
 - `virtual_disk_bus_id`: automatically set to `s` (scsi) or `v` (virtio). note: make sure bootloader is set correctly
 - `virtual_disk_file_allocation`: `fallocate` (default) or `qemu-img`
@@ -132,7 +132,7 @@ while:
 - `virtual_template_type`: type of the template disk image, `lv` (default) or `file`
 - `virtual_template_name_prefix`: the name prefix for the template filename (lv or file), `-<boot_method>-<codename>-<mount_point>` will be appended
 - `virtual_template_vg`: the vg containing the template disk lv
-- `virtual_template_path`: base-path containing file-based disk image template (default: `/var/opt/img`)
+- `virtual_template_path`: base-path containing file-based disk image template (default: `/var/virtual/images`)
 - `virtual_guest_name`: the guests name (default: `inventory_hostname`)
 - `virtual_disk_size_root`: the size of the root lv (min `2G`, the default)
 - `virtual_disk_size_boot`: the size of the boot lv (min `512M`, the default)
@@ -159,7 +159,7 @@ To create additional lvs to be used as mount points, use the `virtual_disks` dic
     - virtual_boot_method: fs
     - virtual_distribution: debian
     - virtual_codename: jessie
-    - virtual_template_path: /var/opt/img
+    - virtual_template_path: /var/virtual/images
     - virtual_template_type: file
     - virtual_template_name_prefix: tpl
     - virtual_guest_name: my-host

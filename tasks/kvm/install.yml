@@ -8,6 +8,9 @@
     file:
       path: '{{ virtual_preseed_base_path }}'
       state: directory
+      owner: root
+      group: libvirt-qemu
+      mode: '0750'
 
   - name: create preseed file
     template:

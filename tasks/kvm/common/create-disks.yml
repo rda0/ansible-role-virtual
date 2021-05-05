@@ -18,6 +18,24 @@
   loop: '{{ virtual_disks_main }}'
   when: virtual_bootstrap_method != 'bootstrap' and virtual_disk_type == 'zvol'
 
+- name: create template file directory
+  file:
+    path: '{{ virtual_template_path }}'
+    state: directory
+    owner: root
+    group: libvirt-qemu
+    mode: '0750'
+  when: virtual_template_type == 'file'
+
+- name: create disk image file directory
+  file:
+    path: '{{ virtual_disk_prefix }}{{ virtual_disk_vg }}'
+    state: directory
+    owner: root
+    group: libvirt-qemu
+    mode: '0750'
+  when: virtual_disk_type == 'file'
+
 - name: "create main disks ({{ ', '.join(virtual_disks_main) }}) file(s) (fallocate)"
   command: 'fallocate -l {{ virtual_disks_main_size[item] }} {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-{{ item }}'
   loop: '{{ virtual_disks_main }}'

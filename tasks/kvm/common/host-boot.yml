@@ -6,6 +6,14 @@
     mode: 0755
   when: virtual_qemu_hook_create
 
+- name: create kernel base path
+  file:
+    path: '{{ virtual_kernel_base_path }}'
+    state: directory
+    owner: root
+    group: libvirt-qemu
+    mode: '0750'
+
 - name: create kernel storage directory
   file:
     path: '{{ virtual_kernel_base_path }}/{{ virtual_guest_name }}'
