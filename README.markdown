@@ -89,7 +89,7 @@ Special variables:
 - `virtual_disk_bus`: defaults to `scsi` (virtio-scsi), use `virtio` for virtio-blk
 - `virtual_disk_bus_id`: automatically set to `s` (scsi) or `v` (virtio). note: make sure bootloader is set correctly
 - `virtual_disk_file_allocation`: `fallocate` (default) or `qemu-img`
-- `virtual_disk_bs`: for zvol only, defaults to `4k`, use per disk key `bs` in `virtual_disks` for extra disks
+- `virtual_disk_bs`: for zvol only, defaults to `4K`, use per disk key `bs` in `virtual_disks` for extra disks
 - `virtual_file_extension`: defaults to `''`, example `.raw`, for file based images/templates only
 
 Required inventory variables (or override via `virtual_` variable):
