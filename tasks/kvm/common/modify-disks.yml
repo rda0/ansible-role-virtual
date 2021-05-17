@@ -57,3 +57,4 @@
     line: 'root:{{ virtual_root_password_hash }}\2'
     backrefs: yes
   no_log: true
+  when: virtual_root_password_hash != ''
