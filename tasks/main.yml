@@ -24,5 +24,6 @@
       state: absent
       purge: "{{ virtual_post_bootstrap_remove_purge | ternary('yes', 'no') }}"
       autoremove: "{{ virtual_post_bootstrap_remove_autoremove | ternary('yes', 'no') }}"
+    tags: virtual_post_bootstrap
 
   tags: virtual
