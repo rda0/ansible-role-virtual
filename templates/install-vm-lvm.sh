@@ -43,6 +43,9 @@ virt-install \
 {% endif %}
 --nographics \
 --noautoconsole \
+{% if virtual_noreboot %}
+--noreboot \
+{% endif %}
 --autostart
 
 #--hvm \ # full virtualized

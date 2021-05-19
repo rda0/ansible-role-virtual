@@ -23,6 +23,9 @@ virt-install \
 --network=bridge={{ virtual_bridge }},model=virtio \
 {% endif %}
 --nographics \
+{% if virtual_noreboot %}
+--noreboot \
+{% endif %}
 --noautoconsole
 
 #--hvm \ # full virtualized
