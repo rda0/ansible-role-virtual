@@ -1,6 +1,6 @@
 ---
 - stat:
-    path: "{{ virtual_disk_prefix }}{{ (item.1.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.1.mount|default('{{ virtual_disk_prefix }}{{ virtual_disk_bus_id }}d' + virtual_disks_letters[item.0])|replace('/', '-') }}{{ virtual_disk_suffix }}"
+    path: "{{ virtual_disk_prefix }}{{ (item.1.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.1.mount|default('{{ virtual_disk_prefix }}/{{ virtual_disk_bus_id }}d' + virtual_disks_letters[item.0])|replace('/', '-') }}{{ virtual_disk_suffix }}"
   register: virtual_disks_stat
   with_indexed_items: '{{ virtual_disks }}'
 
@@ -12,14 +12,14 @@
 - name: create extra disks lvs
   lvol:
     vg: '{{ (item.1.vg|default(virtual_disk_vg)) }}'
-    lv: "{{ virtual_guest_name }}{{ item.1.mount|default(virtual_disk_prefix + virtual_disk_bus_id + 'd' + virtual_disks_letters[item.0])|replace('/', '-') }}"
+    lv: "{{ virtual_guest_name }}{{ item.1.mount|default(virtual_disk_prefix + '/' + virtual_disk_bus_id + 'd' + virtual_disks_letters[item.0])|replace('/', '-') }}"
     size: "{{ item.1.size }}"
   with_indexed_items: '{{ virtual_disks }}'
   when: virtual_disk_type == 'lv'
 
 - name: "create extra disks zvols"
   zfs:
-    name: "{{ (item.1.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.1.mount|default(virtual_disk_prefix + virtual_disk_bus_id + 'd' + virtual_disks_letters[item.0])|replace('/', '-') }}"
+    name: "{{ (item.1.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.1.mount|default(virtual_disk_prefix + '/' + virtual_disk_bus_id + 'd' + virtual_disks_letters[item.0])|replace('/', '-') }}"
     state: present
     extra_zfs_properties:
       volsize: "{{ item.1.size }}"
@@ -29,12 +29,12 @@
   when: virtual_disk_type == 'zvol'
 
 - name: "create extra disks files (fallocate)"
-  command: "fallocate -l {{ item.1.size }} {{ virtual_disk_prefix }}{{ (item.1.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.1.mount|default(virtual_disk_prefix + virtual_disk_bus_id + 'd' + virtual_disks_letters[item.0])|replace('/', '-') }}{{ virtual_disk_suffix }}"
+  command: "fallocate -l {{ item.1.size }} {{ virtual_disk_prefix }}{{ (item.1.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.1.mount|default(virtual_disk_prefix + '/' + virtual_disk_bus_id + 'd' + virtual_disks_letters[item.0])|replace('/', '-') }}{{ virtual_disk_suffix }}"
   with_indexed_items: '{{ virtual_disks }}'
   when: virtual_disk_type == 'file' and virtual_disk_file_allocation == 'fallocate'
 
 - name: "create extra disks files (qemu-img)"
-  command: "qemu-img create -f raw -o preallocation=full {{ virtual_disk_prefix }}{{ (item.1.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.1.mount|default(virtual_disk_prefix + virtual_disk_bus_id + 'd' + virtual_disks_letters[item.0])|replace('/', '-') }} {{ item.1.size }}{{ virtual_disk_suffix }}"
+  command: "qemu-img create -f raw -o preallocation=full {{ virtual_disk_prefix }}{{ (item.1.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.1.mount|default(virtual_disk_prefix + '/' + virtual_disk_bus_id + 'd' + virtual_disks_letters[item.0])|replace('/', '-') }} {{ item.1.size }}{{ virtual_disk_suffix }}"
   throttle: 1
   with_indexed_items: '{{ virtual_disks }}'
   when: virtual_disk_type == 'file' and virtual_disk_file_allocation == 'qemu-img'

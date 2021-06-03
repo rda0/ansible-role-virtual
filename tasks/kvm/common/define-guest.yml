@@ -36,7 +36,7 @@
     {% endif %}
     --disk=path={{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root{{ virtual_disk_suffix }},bus={{ virtual_disk_bus }},cache={{ virtual_disk_cache }},io={{ virtual_disk_io }}{% if virtual_disk_bus == 'scsi' %},address.type=drive,address.controller=0,address.bus=0,address.target={{ virtual_disk_boot_index }},address.unit={{ virtual_disk_boot_index }}{% endif %}{{ '' if virtual_boot_method == 'part' else ',boot_order=1' }} \
     {% for disk in virtual_disks|default([]) %}
-    --disk=path={{ virtual_disk_prefix }}{{ (disk.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ disk.mount|default('/dev/' + virtual_disk_bus_id + 'd' + virtual_disks_letters[loop.index - 1])|replace('/', '-') }}{{ virtual_disk_suffix }},bus={{ virtual_disk_bus }},cache={{ virtual_disk_cache }},io={{ virtual_disk_io }}{% if virtual_disk_bus == 'scsi' %},address.type=drive,address.controller=0,address.bus=0,address.target={{ loop.index + virtual_disk_boot_index|int }},address.unit={{ loop.index + virtual_disk_boot_index|int }}{% endif %} \
+    --disk=path={{ virtual_disk_prefix }}{{ (disk.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ disk.mount|default(virtual_disk_prefix + '/' + virtual_disk_bus_id + 'd' + virtual_disks_letters[loop.index - 1])|replace('/', '-') }}{{ virtual_disk_suffix }},bus={{ virtual_disk_bus }},cache={{ virtual_disk_cache }},io={{ virtual_disk_io }}{% if virtual_disk_bus == 'scsi' %},address.type=drive,address.controller=0,address.bus=0,address.target={{ loop.index + virtual_disk_boot_index|int }},address.unit={{ loop.index + virtual_disk_boot_index|int }}{% endif %} \
     {% endfor %}
     {% if virtual_bootstrap_method != 'install' %}
     --import \
