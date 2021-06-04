@@ -13,6 +13,7 @@
   - name: wait for virtual host to become ready
     wait_for_connection:
       timeout: '{{ virtual_post_bootstrap_timeout }}'
+    tags: virtual_post_bootstrap
 
   - name: gather facts
     setup:
