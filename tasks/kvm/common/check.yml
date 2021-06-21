@@ -2,11 +2,13 @@
 - name: check if '{{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root{{ virtual_disk_suffix }}' exists
   stat:
     path: '{{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root{{ virtual_disk_suffix }}'
+    get_checksum: no
   register: virtual_disk_root_stat
 
 - name: check if '/etc/libvirt/qemu/{{ virtual_guest_name }}.xml' exists
   stat:
     path: '/etc/libvirt/qemu/{{ virtual_guest_name }}.xml'
+    get_checksum: no
   register: virtual_guest_xml_stat
 
 - name: create virtual base path

@@ -1,6 +1,7 @@
 ---
 - stat:
     path: "{{ virtual_disk_prefix }}{{ (item.1.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.1.mount|default('{{ virtual_disk_prefix }}/{{ virtual_disk_bus_id }}d' + virtual_disks_letters[item.0])|replace('/', '-') }}{{ virtual_disk_suffix }}"
+    get_checksum: no
   register: virtual_disks_stat
   with_indexed_items: '{{ virtual_disks }}'
 
