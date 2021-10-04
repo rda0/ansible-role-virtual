@@ -41,6 +41,9 @@ virt-install \
 {% else %}
 --network=bridge={{ virtual_bridge }},model=virtio,target={{ virtual_interface_name }} \
 {% endif %}
+{% for interface in virtual_interfaces|default([]) %}
+--network=bridge={{ (interface.bridge|default(virtual_bridge)) }},model=virtio,target={{ (interface.name|default(virtual_interface_name + '-' + interface.suffix)) }} \
+{% endfor %}
 --nographics \
 --noautoconsole \
 {% if virtual_noreboot %}
