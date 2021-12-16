@@ -23,4 +23,3 @@
   command: 'virt-get-kernel --unversioned-names --add {{ virtual_kernel_disk_path }} --output {{ virtual_kernel_base_path }}/{{ virtual_guest_name }}'
   args:
     creates: '{{ virtual_kernel_base_path }}/{{ virtual_guest_name }}/vmlinuz'
-
