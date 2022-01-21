@@ -211,6 +211,26 @@ The above will create (or import) the following disks and mount points:
 - `disk.options`: default is `virtual_disk_mount_options`
 - `disk.import`: when `True` import existing disk, disk contents will not be modified (only use leaf mount points)
 
+To import disks from other disk types, override `prefix`, `suffix` and `vg` accordingly, example:
+
+```yaml
+virtual_file_extension: '.raw'
+virtual_disk_type: file
+virtual_disk_vg: /var/virtual/images
+virtual_disks:
+  - mount: /var/lv
+    size: 2G
+    prefix: /dev/
+    vg: vg0
+    suffix: ''
+    import: True
+  - mount: /var/zvol
+    size: 2G
+    prefix: /dev/
+    vg: zp0
+    suffix: ''
+    import: True
+```
 
 To create additional interfaces use `virtual_interfaces`:
 
