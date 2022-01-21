@@ -140,7 +140,7 @@ while:
 - `virtual_disk_size_boot`: the size of the boot lv (min `512M`, the default)
 - `virtual_disk_vg`: the volume group where `<hostname>-root` (and optional `<hostname>-boot`) LVs will be created
 - `virtual_disk_fs`: the default filesystem to be used for additional `virtual_disks` with mount points
-- `virtual_disks`: optional parameter to create lvs for other mount points
+- `virtual_disks`: optional parameter to create disks for other mount points
 - `virtual_guest_name`: the geuests name used in libvirt and virsh (example: `virsh start <virtual_guest_name>`), use the short hostname
 - `virtual_cpus`: amount of virtual cpus
 - `virtual_memory`: memory in MB
@@ -149,7 +149,7 @@ while:
 
 In this example the whole extra disks `virtual_disks` key was removed to not create any additional mount points or empty disks.
 
-To create additional lvs to be used as mount points, use the `virtual_disks` dictionary:
+To create additional disks to be used as mount points, use the `virtual_disks` dictionary:
 
 ```yaml
 - hosts: my-host
@@ -169,7 +169,7 @@ To create additional lvs to be used as mount points, use the `virtual_disks` dic
     - virtual_memory: 2048
     - virtual_disk_size_root: 4G
     - virtual_disk_vg: vg0
-    - virtual_disk_fs: ext3
+    - virtual_disk_fs: ext4
     - virtual_bridge: br0
     - virtual_mac: '52:54:00:7a:3b:8f'
     - virtual_disks:
@@ -186,20 +186,31 @@ To create additional lvs to be used as mount points, use the `virtual_disks` dic
           vg: vg1-data
           fs: xfs
         - size: 10G
+        - mount: /var/data
+          size: 4T
+          vg: vg1-data
+          import: True
   roles:
     - virtual
 ```
 
-The above will create the following disks and mount points (if `disk.vg`, `disk.fs` or `disk.options` is omitted, the value from `virtual_disk_vg`, `virtual_disk_fs` or `virtual_disk_mount_options` will be used):
+The above will create (or import) the following disks and mount points:
 
 ```
-/dev/sda /        ext3   4G vg0
-/dev/sdb /var     ext3   2G vg0
-/dev/sdc /var/log ext3   2G vg0
-/dev/sdd /export  ext3 100G vg1-data
-/dev/sde /scratch xfs   20G vg1-data
-/dev/sdf                10G vg0
+/dev/sda /         ext4   4G vg0
+/dev/sdb /var      ext4   2G vg0
+/dev/sdc /var/log  ext4   2G vg0
+/dev/sdd /export   ext4 100G vg1-data
+/dev/sde /scratch  xfs   20G vg1-data
+/dev/sdf                 10G vg0
+/dev/sdg /var/data ext3   4T vg1-data
 ```
+
+- `disk.vg`: default is `virtual_disk_vg`
+- `disk.fs`: default is `virtual_disk_fs`
+- `disk.options`: default is `virtual_disk_mount_options`
+- `disk.import`: when `True` import existing disk, disk contents will not be modified (only use leaf mount points)
+
 
 To create additional interfaces use `virtual_interfaces`:
 

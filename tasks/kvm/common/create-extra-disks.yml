@@ -1,15 +1,4 @@
 ---
-- stat:
-    path: "{{ virtual_disk_prefix }}{{ (item.1.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.1.mount|default('{{ virtual_disk_prefix }}/{{ virtual_disk_bus_id }}d' + virtual_disks_letters[item.0])|replace('/', '-') }}{{ virtual_disk_suffix }}"
-    get_checksum: no
-  register: virtual_disks_stat
-  with_indexed_items: '{{ virtual_disks }}'
-
-- fail:
-    msg: 'guest disk already exists: {{ item.invocation.module_args.path }}'
-  when: item.stat.exists is defined and item.stat.exists == True
-  with_items: '{{ virtual_disks_stat.results }}'
-
 - name: create extra disks lvs
   lvol:
     vg: '{{ (item.1.vg|default(virtual_disk_vg)) }}'
@@ -28,7 +17,7 @@
 
 - name: "create extra disks files (fallocate)"
   command: "fallocate -l {{ item.1.size }} {{ virtual_disk_prefix }}{{ (item.1.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.1.mount|default(virtual_disk_prefix + '/' + virtual_disk_bus_id + 'd' + virtual_disks_letters[item.0])|replace('/', '-') }}{{ virtual_disk_suffix }}"
-  with_indexed_items: '{{ virtual_disks }}'
+  with_indexed_items: "{{ (virtual_disks|selectattr('import','undefined')|list) + (virtual_disks|selectattr('import','defined')|rejectattr('import')|list) }}"
   when: virtual_disk_type == 'file' and virtual_disk_file_allocation == 'fallocate'
 
 - name: "create extra disks files (qemu-img)"
