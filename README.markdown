@@ -200,6 +200,22 @@ The above will create the following disks and mount points (if `disk.vg`, `disk.
 /dev/sdf                10G vg0
 ```
 
+To create additional interfaces use `virtual_interfaces`:
+
+```yaml
+virtual_interfaces:
+  - suffix: foo
+  - suffix: bar
+    mac: '52:54:00:a0:b0:c0'
+  - name: full-interface-name
+    mac: '52:54:00:a0:b0:c1'
+    bridge: br-foobar
+```
+
+- `suffix`: will be appended (with `-`) to the name of the main interface
+- `mac`: (optional) if omitted a mac will be generated
+- `bridge`: (optional) defaults to `virtual_bridge`
+
 ### Experimental
 
 virtiofs: Sharing a host directory with a guest
