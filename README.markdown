@@ -89,8 +89,9 @@ Special variables:
 - `virtual_disk_bus`: defaults to `scsi` (virtio-scsi), use `virtio` for virtio-blk
 - `virtual_disk_bus_id`: automatically set to `s` (scsi) or `v` (virtio). note: make sure bootloader is set correctly
 - `virtual_disk_file_allocation`: `fallocate` (default) or `qemu-img`
-- `virtual_disk_bs`: for zvol only, defaults to `4K`, use per disk key `bs` in `virtual_disks` for extra disks
+- `virtual_disk_bs`: for zvol only, defaults to `8K`, use per disk key `bs` in `virtual_disks` for extra disks
 - `virtual_file_extension`: defaults to `''`, example `.raw`, for file based images/templates only
+- `virtual_disk_zfs_props`: defaults to `{}`, dict with zfs properties (except `volsize`, `volblocksize`, which are overridden), see `man zfsprops`
 
 Required inventory variables (or override via `virtual_` variable):
 
@@ -215,6 +216,32 @@ virtual_interfaces:
 - `suffix`: will be appended (with `-`) to the name of the main interface
 - `mac`: (optional) if omitted a mac will be generated
 - `bridge`: (optional) defaults to `virtual_bridge`
+
+Example to use zvols:
+
+```yaml
+virtual_disk_size_root: 10G
+virtual_disk_type: zvol
+virtual_disk_vg: zp0
+virtual_disk_bs: 64K
+virtual_disk_zfs_props:
+  compression: 'lz4'
+  reservation: 'none'
+  refreservation: 'none'
+virtual_disks:
+  - mount: /var
+    size: 2G
+    zfs_props:
+      compression: 'off'
+  - mount: /var/log
+    size: 2G
+    bs: 32K
+    zfs_props:
+      compression: 'off'
+```
+
+- `bs`: volblocksize, defaults to `virtual_disk_bs`
+- `zfs_props`: dict of zfs properties, merged with `virtual_disk_zfs_props`
 
 ### Experimental
 

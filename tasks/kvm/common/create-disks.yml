@@ -11,10 +11,7 @@
   zfs:
     name: '{{ virtual_disk_vg }}/{{ virtual_guest_name }}-{{ item }}'
     state: present
-    extra_zfs_properties:
-      volsize: '{{ virtual_disks_main_size[item] }}'
-      volblocksize: '{{ virtual_disk_bs }}'
-      # TODO: allow more props like compression
+    extra_zfs_properties: '{{ virtual_disk_zfs_props|combine({"volsize":virtual_disks_main_size[item]})|combine({"volblocksize":virtual_disk_bs}) }}'
   loop: '{{ virtual_disks_main }}'
   when: virtual_bootstrap_method != 'bootstrap' and virtual_disk_type == 'zvol'
 

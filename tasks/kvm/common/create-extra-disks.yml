@@ -22,10 +22,7 @@
   zfs:
     name: "{{ (item.1.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.1.mount|default(virtual_disk_prefix + '/' + virtual_disk_bus_id + 'd' + virtual_disks_letters[item.0])|replace('/', '-') }}"
     state: present
-    extra_zfs_properties:
-      volsize: "{{ item.1.size }}"
-      volblocksize: '{{ (item.1.bs|default(virtual_disk_bs)) }}'
-      # TODO: allow more props like compression
+    extra_zfs_properties: '{{ item.1.zfs_props|default({})|combine(virtual_disk_zfs_props)|combine({"volsize":item.1.size})|combine({"volblocksize":item.1.bs|default(virtual_disk_bs)}) }}'
   with_indexed_items: '{{ virtual_disks }}'
   when: virtual_disk_type == 'zvol'
 
