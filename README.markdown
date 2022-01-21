@@ -199,3 +199,22 @@ The above will create the following disks and mount points (if `disk.vg`, `disk.
 /dev/sde /scratch xfs   20G vg1-data
 /dev/sdf                10G vg0
 ```
+
+### Experimental
+
+virtiofs: Sharing a host directory with a guest
+
+- https://libvirt.org/kbase/virtiofs.html
+- https://www.kernel.org/doc/html/latest/filesystems/virtiofs.html
+
+```yaml
+virtual_filesystems:
+  - target: mount_test
+    source: /var/test
+```
+
+In the guest mount it with:
+
+```bash
+mount -t virtiofs mount_test /mnt
+```
