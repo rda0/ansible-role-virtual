@@ -69,6 +69,7 @@ virtual_disk_bus_ids:
   scsi: s
   virtio: v
 virtual_disk_bus_id: '{{ virtual_disk_bus_ids[virtual_disk_bus] }}'
+virtual_disk_by_uuid: True
 virtual_disk_mount_options: noatime,nodiratime
 virtual_disk_letters: 'abcdefghijklmnopqrstuvwxyz'
 virtual_disk_zfs_props: {}

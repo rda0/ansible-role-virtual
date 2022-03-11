@@ -5,13 +5,19 @@
     state: directory
   with_items: '{{ virtual_disks | selectattr("mount", "defined") | list }}'
 
-- name: add extra disks to fstab
-  shell: "echo '/dev/{{ virtual_disk_bus_id }}d{{ virtual_disks_letters[item.0] }}  {{ item.1.mount }}  {{ (item.1.fs|default(virtual_disk_fs)) }} {{ (item.1.options|default(virtual_disk_mount_options)) }} 0 2' >> {{ virtual_mount_path }}/root/etc/fstab"
-  with_indexed_items: '{{ virtual_disks | selectattr("mount", "defined") | list }}'
-
 - name: make extra disks filesystems
   command: "mkfs.{{ (item.fs|default(virtual_disk_fs)) }} {{ virtual_disk_prefix }}{{ (item.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.mount|replace('/', '-') }}{{ virtual_disk_suffix }}"
   with_items: "{{ (virtual_disks|selectattr('mount','defined')|selectattr('import','undefined')|list) + (virtual_disks|selectattr('mount','defined')|selectattr('import','defined')|rejectattr('import')|list) }}"
+
+- name: add extra disks to fstab by drive letter
+  shell: "echo '/dev/{{ virtual_disk_bus_id }}d{{ virtual_disks_letters[item.0] }}  {{ item.1.mount }}  {{ (item.1.fs|default(virtual_disk_fs)) }} {{ (item.1.options|default(virtual_disk_mount_options)) }} 0 2' >> {{ virtual_mount_path }}/root/etc/fstab"
+  with_indexed_items: '{{ virtual_disks | selectattr("mount", "defined") | list }}'
+  when: not virtual_disk_by_uuid
+
+- name: add extra disks to fstab by uuid
+  shell: 'echo "UUID=$(blkid -s UUID -o value {{ virtual_disk_prefix }}{{ (item.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.mount|replace("/", "-") }}{{ virtual_disk_suffix }})  {{ item.mount }}  {{ (item.fs|default(virtual_disk_fs)) }} {{ (item.options|default(virtual_disk_mount_options)) }} 0 2" >> {{ virtual_mount_path }}/root/etc/fstab'
+  with_items: '{{ virtual_disks | selectattr("mount", "defined") | list }}'
+  when: virtual_disk_by_uuid
 
 - name: create extra disks mount points in root filesystem
   file:
