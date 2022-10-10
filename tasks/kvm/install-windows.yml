@@ -42,17 +42,17 @@
       - "virsh change-media {{ virtual_guest_name }} <target> /opt/iso/windows/win_srv_16.iso --insert"
 
 - name: execute install-vm.sh
-  command:  # noqa no-changed-when
-    cmd: "/bin/bash {{ vm_path }}/{{ virtual_guest_name }}/install-vm.sh"
+  # noqa no-changed-when
+  command: "/bin/bash {{ vm_path }}/{{ virtual_guest_name }}/install-vm.sh"
 
 - name: wait until vm is shut off
-  command:  # noqa no-changed-when
-    cmd: "/usr/bin/virsh domstate {{ virtual_guest_name }}"
+  # noqa no-changed-when
+  command: "/usr/bin/virsh domstate {{ virtual_guest_name }}"
   register: result
   until: result.stdout.find("shut off") != -1
   retries: 1000
   delay: 10
 
 - name: start vm
-  command:  # noqa no-changed-when
-    cmd: "/usr/bin/virsh start {{ virtual_guest_name }}"
+  # noqa no-changed-when
+  command: "/usr/bin/virsh start {{ virtual_guest_name }}"

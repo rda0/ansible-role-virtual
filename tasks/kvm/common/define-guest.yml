@@ -1,84 +1,84 @@
 ---
 - name: define guest
-  command:  # noqa no-changed-when
-    cmd: |
-      virt-install \
-      --name={{ virtual_guest_name }} \
-      --virt-type=kvm \
-      {% if virtual_machine_type != '' %}
-      --machine={{ virtual_machine_type }} \
-      {% endif %}
-      {% if virtual_memory_hotpluggable %}
-      --cpu={{ virtual_cpu }},cell0.id=0,cell0.cpus={{ virtual_numa_cell_cpus }},cell0.memory={{ virtual_numa_cell_memory }} \
-      --memory=memory={{ virtual_memory }},hotplugmemorymax={{ virtual_memory_max }},hotplugmemoryslots={{ virtual_memory_slots }} \
-      {% else %}
-      --cpu={{ virtual_cpu }} \
-      --memory={{ virtual_memory }} \
-      {% endif %}
-      --cputune={{ virtual_cputune }} \
-      {% if virtual_cpus_hotpluggable %}
-      --vcpus=vcpus={{ virtual_cpus }},maxvcpus={{ virtual_cpus_max }}{{ ',' if virtual_cpuset != '' else '' }}{{ virtual_cpuset }} \
-      {% else %}
-      --vcpus=vcpus={{ virtual_cpus }}{{ ',cpuset=' if virtual_cpuset != '' else '' }}{{ virtual_cpuset }} \
-      {% endif %}
-      {% if virtual_memory_hugepages %}
-      --memorybacking=hugepages=yes,size={{ virtual_memory_hugepages_size }},unit={{ virtual_memory_hugepages_unit }} \
-      {% if virtual_filesystems | default([]) %}
-      --memorybacking=access.mode=shared \
-      {% endif %}
-      {% else %}
-      {% if virtual_filesystems | default([]) %}
-      --memorybacking=access.mode=shared \
-      --memorybacking=source.type=memfd \
-      {% endif %}
-      {% endif %}
-      {% if virtual_memory_balloon %}
-      --memballoon=virtio \
-      {% else %}
-      --memballoon=none \
-      {% endif %}
-      {% if virtual_disk_bus == 'scsi' %}
-      --controller=type=scsi,model=virtio-scsi \
-      {% endif %}
-      {% if virtual_boot_method == 'part' %}
-      --disk=path={{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-boot{{ virtual_disk_suffix }},bus={{ virtual_disk_bus }},cache={{ virtual_disk_cache }},io={{ virtual_disk_io }}{% if virtual_disk_bus == 'scsi' %},address.type=drive,address.controller=0,address.bus=0,address.target=0,address.unit=0{% endif %},boot_order=1 \
-      {% endif %}
-      --disk=path={{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root{{ virtual_disk_suffix }},bus={{ virtual_disk_bus }},cache={{ virtual_disk_cache }},io={{ virtual_disk_io }}{% if virtual_disk_bus == 'scsi' %},address.type=drive,address.controller=0,address.bus=0,address.target={{ virtual_disk_boot_index }},address.unit={{ virtual_disk_boot_index }}{% endif %}{{ '' if virtual_boot_method == 'part' else ',boot_order=1' }} \
-      {% for disk in virtual_disks | default([]) %}
-      --disk=path={{ disk.prefix | default(virtual_disk_prefix) }}{{ (disk.vg | default(virtual_disk_vg)) }}/{{ disk.guest_name | default(virtual_guest_name) }}{{ disk.mount | default(disk.prefix | default(virtual_disk_prefix) + '/' + virtual_disk_bus_id + 'd' + virtual_disks_letters[loop.index - 1]) | replace('/', '-') }}{{ disk.suffix | default(virtual_disk_suffix) }},bus={{ virtual_disk_bus }},cache={{ virtual_disk_cache }},io={{ virtual_disk_io }}{% if virtual_disk_bus == 'scsi' %},address.type=drive,address.controller=0,address.bus=0,address.target={{ loop.index + virtual_disk_boot_index | int }},address.unit={{ loop.index + virtual_disk_boot_index | int }}{% endif %} \
-      {% endfor %}
-      {% for fs in virtual_filesystems | default([]) %}
-      --filesystem=type=mount,accessmode=passthrough,driver.type=virtiofs,source={{ fs.source }},target={{ fs.target }} \
-      {% endfor %}
-      {% if virtual_bootstrap_method != 'install' %}
-      --import \
-      {% else %}
-      --location={{ virtual_location }} \
-      --extra-args='{{ virtual_install_kernel_args }}' \
-      {% endif %}
-      {% if virtual_boot_method == 'preseed' %}
-      --initrd-inject={{ virtual_preseed_path }}
-      {% endif %}
-      --os-type=linux \
-      --os-variant={{ virtual_os_variant }} \
-      --console=pty,target_type=serial \
-      {% if virtual_boot_method == 'host' %}
-      --boot=kernel={{ virtual_kernel_base_path }}/{{ virtual_guest_name }}/vmlinuz,initrd={{ virtual_kernel_base_path }}/{{ virtual_guest_name }}/initrd.img,kernel_args="{{ virtual_kernel_args }}" \
-      {% endif %}
-      {% if virtual_mac is defined %}
-      --network=bridge={{ virtual_bridge }},model=virtio,target={{ virtual_interface_name }},mac={{ virtual_mac }} \
-      {% else %}
-      --network=bridge={{ virtual_bridge }},model=virtio,target={{ virtual_interface_name }} \
-      {% endif %}
-      {% for interface in virtual_interfaces | default([]) %}
-      --network=bridge={{ (interface.bridge | default(virtual_bridge)) }},model=virtio,target={{ (interface.name | default(virtual_interface_name + '-' + interface.suffix)) }}{% if interface.mac | default('') %},mac={{ interface.mac }}{% endif %} \
-      {% endfor %}
-      --nographics \
-      --noautoconsole \
-      {% if virtual_noreboot %}
-      --noreboot \
-      {% endif %}
-      --autostart
+  # noqa no-changed-when
+  command: |
+    virt-install \
+    --name={{ virtual_guest_name }} \
+    --virt-type=kvm \
+    {% if virtual_machine_type != '' %}
+    --machine={{ virtual_machine_type }} \
+    {% endif %}
+    {% if virtual_memory_hotpluggable %}
+    --cpu={{ virtual_cpu }},cell0.id=0,cell0.cpus={{ virtual_numa_cell_cpus }},cell0.memory={{ virtual_numa_cell_memory }} \
+    --memory=memory={{ virtual_memory }},hotplugmemorymax={{ virtual_memory_max }},hotplugmemoryslots={{ virtual_memory_slots }} \
+    {% else %}
+    --cpu={{ virtual_cpu }} \
+    --memory={{ virtual_memory }} \
+    {% endif %}
+    --cputune={{ virtual_cputune }} \
+    {% if virtual_cpus_hotpluggable %}
+    --vcpus=vcpus={{ virtual_cpus }},maxvcpus={{ virtual_cpus_max }}{{ ',' if virtual_cpuset != '' else '' }}{{ virtual_cpuset }} \
+    {% else %}
+    --vcpus=vcpus={{ virtual_cpus }}{{ ',cpuset=' if virtual_cpuset != '' else '' }}{{ virtual_cpuset }} \
+    {% endif %}
+    {% if virtual_memory_hugepages %}
+    --memorybacking=hugepages=yes,size={{ virtual_memory_hugepages_size }},unit={{ virtual_memory_hugepages_unit }} \
+    {% if virtual_filesystems | default([]) %}
+    --memorybacking=access.mode=shared \
+    {% endif %}
+    {% else %}
+    {% if virtual_filesystems | default([]) %}
+    --memorybacking=access.mode=shared \
+    --memorybacking=source.type=memfd \
+    {% endif %}
+    {% endif %}
+    {% if virtual_memory_balloon %}
+    --memballoon=virtio \
+    {% else %}
+    --memballoon=none \
+    {% endif %}
+    {% if virtual_disk_bus == 'scsi' %}
+    --controller=type=scsi,model=virtio-scsi \
+    {% endif %}
+    {% if virtual_boot_method == 'part' %}
+    --disk=path={{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-boot{{ virtual_disk_suffix }},bus={{ virtual_disk_bus }},cache={{ virtual_disk_cache }},io={{ virtual_disk_io }}{% if virtual_disk_bus == 'scsi' %},address.type=drive,address.controller=0,address.bus=0,address.target=0,address.unit=0{% endif %},boot_order=1 \
+    {% endif %}
+    --disk=path={{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root{{ virtual_disk_suffix }},bus={{ virtual_disk_bus }},cache={{ virtual_disk_cache }},io={{ virtual_disk_io }}{% if virtual_disk_bus == 'scsi' %},address.type=drive,address.controller=0,address.bus=0,address.target={{ virtual_disk_boot_index }},address.unit={{ virtual_disk_boot_index }}{% endif %}{{ '' if virtual_boot_method == 'part' else ',boot_order=1' }} \
+    {% for disk in virtual_disks | default([]) %}
+    --disk=path={{ disk.prefix | default(virtual_disk_prefix) }}{{ (disk.vg | default(virtual_disk_vg)) }}/{{ disk.guest_name | default(virtual_guest_name) }}{{ disk.mount | default(disk.prefix | default(virtual_disk_prefix) + '/' + virtual_disk_bus_id + 'd' + virtual_disks_letters[loop.index - 1]) | replace('/', '-') }}{{ disk.suffix | default(virtual_disk_suffix) }},bus={{ virtual_disk_bus }},cache={{ virtual_disk_cache }},io={{ virtual_disk_io }}{% if virtual_disk_bus == 'scsi' %},address.type=drive,address.controller=0,address.bus=0,address.target={{ loop.index + virtual_disk_boot_index | int }},address.unit={{ loop.index + virtual_disk_boot_index | int }}{% endif %} \
+    {% endfor %}
+    {% for fs in virtual_filesystems | default([]) %}
+    --filesystem=type=mount,accessmode=passthrough,driver.type=virtiofs,source={{ fs.source }},target={{ fs.target }} \
+    {% endfor %}
+    {% if virtual_bootstrap_method != 'install' %}
+    --import \
+    {% else %}
+    --location={{ virtual_location }} \
+    --extra-args='{{ virtual_install_kernel_args }}' \
+    {% endif %}
+    {% if virtual_boot_method == 'preseed' %}
+    --initrd-inject={{ virtual_preseed_path }}
+    {% endif %}
+    --os-type=linux \
+    --os-variant={{ virtual_os_variant }} \
+    --console=pty,target_type=serial \
+    {% if virtual_boot_method == 'host' %}
+    --boot=kernel={{ virtual_kernel_base_path }}/{{ virtual_guest_name }}/vmlinuz,initrd={{ virtual_kernel_base_path }}/{{ virtual_guest_name }}/initrd.img,kernel_args="{{ virtual_kernel_args }}" \
+    {% endif %}
+    {% if virtual_mac is defined %}
+    --network=bridge={{ virtual_bridge }},model=virtio,target={{ virtual_interface_name }},mac={{ virtual_mac }} \
+    {% else %}
+    --network=bridge={{ virtual_bridge }},model=virtio,target={{ virtual_interface_name }} \
+    {% endif %}
+    {% for interface in virtual_interfaces | default([]) %}
+    --network=bridge={{ (interface.bridge | default(virtual_bridge)) }},model=virtio,target={{ (interface.name | default(virtual_interface_name + '-' + interface.suffix)) }}{% if interface.mac | default('') %},mac={{ interface.mac }}{% endif %} \
+    {% endfor %}
+    --nographics \
+    --noautoconsole \
+    {% if virtual_noreboot %}
+    --noreboot \
+    {% endif %}
+    --autostart
 
 - name: trigger post define hook
   shell: '{{ virtual_post_define_hook }}'

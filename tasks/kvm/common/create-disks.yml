@@ -34,14 +34,12 @@
   when: virtual_disk_type == 'file'
 
 - name: "create main disks ({{ ', '.join(virtual_disks_main) }}) file(s) (fallocate)"
-  command:
-    cmd: 'fallocate -l {{ virtual_disks_main_size[item] }} {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-{{ item }}{{ virtual_disk_suffix }}'
+  command: 'fallocate -l {{ virtual_disks_main_size[item] }} {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-{{ item }}{{ virtual_disk_suffix }}'
   loop: '{{ virtual_disks_main }}'
   when: virtual_bootstrap_method != 'bootstrap' and virtual_disk_type == 'file' and virtual_disk_file_allocation == 'fallocate'
 
 - name: "create main disks ({{ ', '.join(virtual_disks_main) }}) file(s) (qemu-img)"
-  command:
-    cmd: 'qemu-img create -f raw -o preallocation=full {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-{{ item }} {{ virtual_disks_main_size[item] }}{{ virtual_disk_suffix }}'
+  command: 'qemu-img create -f raw -o preallocation=full {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-{{ item }} {{ virtual_disks_main_size[item] }}{{ virtual_disk_suffix }}'
   loop: '{{ virtual_disks_main }}'
   throttle: 1
   when: virtual_bootstrap_method != 'bootstrap' and virtual_disk_type == 'file' and virtual_disk_file_allocation == 'qemu-img'
@@ -67,8 +65,8 @@
   block:
 
   - name: umount root filesystem
-    command:  # noqa no-changed-when
-      cmd: 'umount {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root{{ virtual_disk_suffix }}'
+    # noqa no-changed-when
+    command: 'umount {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root{{ virtual_disk_suffix }}'
 
   - name: remove mount dir
     file:

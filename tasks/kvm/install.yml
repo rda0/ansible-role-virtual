@@ -23,13 +23,13 @@
   include_tasks: common/check.yml
 
 - name: wait until guest is shut off
-  command:  # noqa no-changed-when
-    cmd: "virsh domstate {{ virtual_guest_name }}"
+  # noqa no-changed-when
+  command: "virsh domstate {{ virtual_guest_name }}"
   register: result
   until: result.stdout.find("shut off") != -1
   retries: 1000
   delay: 10
 
 - name: start guest
-  command:  # noqa no-changed-when
-    cmd: "virsh start {{ virtual_guest_name }}"
+  # noqa no-changed-when
+  command: "virsh start {{ virtual_guest_name }}"

@@ -4,16 +4,16 @@
     virtual_mount_path: "{{ virtual_mount_base_path }}/{{ virtual_guest_name }}_{{ 1000000 | random | hash('sha1') }}"
 
 - name: check root filesystem
-  command:  # noqa no-changed-when
-    cmd: 'e2fsck -pf {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root{{ virtual_disk_suffix }}'
+  # noqa no-changed-when
+  command: 'e2fsck -pf {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root{{ virtual_disk_suffix }}'
 
 - name: change root filesystem uuid
-  shell:  # noqa no-changed-when
-    cmd: 'echo y | tune2fs {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root{{ virtual_disk_suffix }} -U random'
+  # noqa no-changed-when
+  shell: 'echo y | tune2fs {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root{{ virtual_disk_suffix }} -U random'
 
 - name: resize root filesystem
-  command:  # noqa no-changed-when
-    cmd: 'resize2fs {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root{{ virtual_disk_suffix }}'
+  # noqa no-changed-when
+  command: 'resize2fs {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root{{ virtual_disk_suffix }}'
 
 - name: create root mount dir
   file:
@@ -21,8 +21,8 @@
     state: directory  # noqa risky-file-permissions
 
 - name: mount root filesystem
-  command:  # noqa no-changed-when
-    cmd: 'mount {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root{{ virtual_disk_suffix }} {{ virtual_mount_path }}/root'
+  # noqa no-changed-when
+  command: 'mount {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root{{ virtual_disk_suffix }} {{ virtual_mount_path }}/root'
   args:
     warn: false
 
@@ -54,8 +54,7 @@
   block:
 
   - name: modify syslinux root uuid
-    shell:
-      cmd: 'sed -i "s/\/dev\/sda/UUID=$(blkid -s UUID -o value {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root{{ virtual_disk_suffix }})/" {{ virtual_mount_path }}/root/syslinux.cfg'
+    shell: 'sed -i "s/\/dev\/sda/UUID=$(blkid -s UUID -o value {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root{{ virtual_disk_suffix }})/" {{ virtual_mount_path }}/root/syslinux.cfg'
     when: virtual_guest_syslinux_stat.stat.exists
 
   - name: when virtual boot method is not part
@@ -63,24 +62,24 @@
     block:
 
     - name: modify fstab root uuid
-      shell:  # noqa no-changed-when
-        cmd: 'sed -i "s/\/dev\/sda/UUID=$(blkid -s UUID -o value {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root{{ virtual_disk_suffix }})/" {{ virtual_mount_path }}/root/etc/fstab'
+      # noqa no-changed-when
+      shell: 'sed -i "s/\/dev\/sda/UUID=$(blkid -s UUID -o value {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root{{ virtual_disk_suffix }})/" {{ virtual_mount_path }}/root/etc/fstab'
 
   - name: when virtual boot method is part
     when: virtual_boot_method == 'part'
     block:
 
     - name: modify fstab root uuid
-      shell:  # noqa no-changed-when
-        cmd: 'sed -i "s/\/dev\/sdb/UUID=$(blkid -s UUID -o value {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root{{ virtual_disk_suffix }})/" {{ virtual_mount_path }}/root/etc/fstab'
+      # noqa no-changed-when
+      shell: 'sed -i "s/\/dev\/sdb/UUID=$(blkid -s UUID -o value {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root{{ virtual_disk_suffix }})/" {{ virtual_mount_path }}/root/etc/fstab'
 
     - name: modify fstab root uuid
-      shell:  # noqa no-changed-when
-        cmd: 'sed -i "s/\/dev\/sda1/UUID=$(blkid -s UUID -o value {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-boot{{ virtual_disk_suffix }})/" {{ virtual_mount_path }}/root/etc/fstab'
+      # noqa no-changed-when
+      shell: 'sed -i "s/\/dev\/sda1/UUID=$(blkid -s UUID -o value {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-boot{{ virtual_disk_suffix }})/" {{ virtual_mount_path }}/root/etc/fstab'
 
 - name: set hostname
-  shell:  # noqa no-changed-when
-    cmd: 'echo "{{ virtual_guest_name }}" > {{ virtual_mount_path }}/root/etc/hostname'
+  # noqa no-changed-when
+  shell: 'echo "{{ virtual_guest_name }}" > {{ virtual_mount_path }}/root/etc/hostname'
 
 - name: include tasks from copy_host_keys.yml
   include_tasks: copy_host_keys.yml

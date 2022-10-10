@@ -1,12 +1,11 @@
 ---
 - name: create template
-  command:
-    cmd: '{{ virtual_template_command }}'
+  command: '{{ virtual_template_command }}'
   args:
     creates: "{{ virtual_template_base }}-root{% if virtual_template_type == 'file' %}{{ virtual_template_file_extension }}{% endif %}"
   when: virtual_template_create
 
 - name: "clone disks ({{ ', '.join(virtual_disks_main) }}) from template"
-  command:  # noqa no-changed-when
-    cmd: "dd if={{ virtual_template_base }}-{{ item }}{% if virtual_template_type == 'file' %}{{ virtual_template_file_extension }}{% endif %} of={{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-{{ item }}{{ virtual_disk_suffix }} bs=1M conv=notrunc"
+  # noqa no-changed-when
+  command: "dd if={{ virtual_template_base }}-{{ item }}{% if virtual_template_type == 'file' %}{{ virtual_template_file_extension }}{% endif %} of={{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-{{ item }}{{ virtual_disk_suffix }} bs=1M conv=notrunc"
   loop: '{{ virtual_disks_main }}'
