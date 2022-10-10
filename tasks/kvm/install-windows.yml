@@ -11,7 +11,12 @@
     verbosity: 4
 
 - name: create vm dir
-  file: path={{ item }} state=directory owner=root group=root mode=0700
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0700
   with_items:
     - "{{ vm_path }}/{{ virtual_guest_name }}"
 
@@ -23,7 +28,8 @@
     group: root
     mode: 0770
 
-- debug:
+- name: print info
+  debug:
     msg:
       - "run `virt-viewer --connect qemu:///system {{ virtual_guest_name }}` to connect via vnc"
       - "click your way through the gui, when at the 'load drivers' screen, run:"
@@ -36,14 +42,17 @@
       - "virsh change-media {{ virtual_guest_name }} <target> /opt/iso/windows/win_srv_16.iso --insert"
 
 - name: execute install-vm.sh
-  command: "/bin/bash {{ vm_path }}/{{ virtual_guest_name }}/install-vm.sh"
+  command:  # noqa no-changed-when
+    cmd: "/bin/bash {{ vm_path }}/{{ virtual_guest_name }}/install-vm.sh"
 
 - name: wait until vm is shut off
-  command: /usr/bin/virsh domstate {{ virtual_guest_name }}
+  command:  # noqa no-changed-when
+    cmd: "/usr/bin/virsh domstate {{ virtual_guest_name }}"
   register: result
   until: result.stdout.find("shut off") != -1
   retries: 1000
   delay: 10
 
 - name: start vm
-  command: /usr/bin/virsh start {{ virtual_guest_name }}
+  command:  # noqa no-changed-when
+    cmd: "/usr/bin/virsh start {{ virtual_guest_name }}"

@@ -19,26 +19,27 @@
     group: root
     mode: '0755'
 
-- block:
+- name: create disks block
+  when: not (virtual_disk_root_stat.stat.exists is defined and virtual_disk_root_stat.stat.exists)
+  block:
 
   - name: check if extra disks to be created exist
     stat:
-      path: "{{ (item.prefix|default(virtual_disk_prefix)) }}{{ (item.1.vg|default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.1.mount|default('{{ (item.prefix|default(virtual_disk_prefix)) }}/{{ virtual_disk_bus_id }}d' + virtual_disks_letters[item.0])|replace('/', '-') }}{{ (item.suffix|default(virtual_disk_suffix)) }}"
+      path: "{{ (item.prefix | default(virtual_disk_prefix)) }}{{ (item.1.vg | default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.1.mount | default('{{ (item.prefix|default(virtual_disk_prefix)) }}/{{ virtual_disk_bus_id }}d' + virtual_disks_letters[item.0]) | replace('/', '-') }}{{ (item.suffix | default(virtual_disk_suffix)) }}"
       get_checksum: no
     register: virtual_disks_stat
-    with_indexed_items: "{{ (virtual_disks|selectattr('import','undefined')|list) + (virtual_disks|selectattr('import','defined')|rejectattr('import')|list) }}"
+    with_indexed_items: "{{ (virtual_disks | selectattr('import', 'undefined') | list) + (virtual_disks | selectattr('import', 'defined') | rejectattr('import') | list) }}"
 
   - name: fail when extra disks to be created already exist
     fail:
       msg: 'guest disk already exists: {{ item.invocation.module_args.path }}'
-    when: item.stat.exists is defined and item.stat.exists == True
+    when: item.stat.exists is defined and item.stat.exists
     with_items: '{{ virtual_disks_stat.results }}'
 
   - name: include create disks
     include_tasks: create-disks.yml
 
-  when: not (virtual_disk_root_stat.stat.exists is defined and virtual_disk_root_stat.stat.exists == True)
 
 - name: include define guest
   include_tasks: define-guest.yml
-  when: not (virtual_guest_xml_stat.stat.exists is defined and virtual_guest_xml_stat.stat.exists == True)
+  when: not (virtual_guest_xml_stat.stat.exists is defined and virtual_guest_xml_stat.stat.exists)

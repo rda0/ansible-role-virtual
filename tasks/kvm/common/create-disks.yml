@@ -11,7 +11,7 @@
   zfs:
     name: '{{ virtual_disk_vg }}/{{ virtual_guest_name }}-{{ item }}'
     state: present
-    extra_zfs_properties: '{{ virtual_disk_zfs_props|combine({"volsize":virtual_disks_main_size[item]})|combine({"volblocksize":virtual_disk_bs}) }}'
+    extra_zfs_properties: '{{ virtual_disk_zfs_props | combine({"volsize": virtual_disks_main_size[item]}) | combine({"volblocksize": virtual_disk_bs}) }}'
   loop: '{{ virtual_disks_main }}'
   when: virtual_bootstrap_method != 'bootstrap' and virtual_disk_type == 'zvol'
 
@@ -34,12 +34,14 @@
   when: virtual_disk_type == 'file'
 
 - name: "create main disks ({{ ', '.join(virtual_disks_main) }}) file(s) (fallocate)"
-  command: 'fallocate -l {{ virtual_disks_main_size[item] }} {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-{{ item }}{{ virtual_disk_suffix }}'
+  command:
+    cmd: 'fallocate -l {{ virtual_disks_main_size[item] }} {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-{{ item }}{{ virtual_disk_suffix }}'
   loop: '{{ virtual_disks_main }}'
   when: virtual_bootstrap_method != 'bootstrap' and virtual_disk_type == 'file' and virtual_disk_file_allocation == 'fallocate'
 
 - name: "create main disks ({{ ', '.join(virtual_disks_main) }}) file(s) (qemu-img)"
-  command: 'qemu-img create -f raw -o preallocation=full {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-{{ item }} {{ virtual_disks_main_size[item] }}{{ virtual_disk_suffix }}'
+  command:
+    cmd: 'qemu-img create -f raw -o preallocation=full {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-{{ item }} {{ virtual_disks_main_size[item] }}{{ virtual_disk_suffix }}'
   loop: '{{ virtual_disks_main }}'
   throttle: 1
   when: virtual_bootstrap_method != 'bootstrap' and virtual_disk_type == 'file' and virtual_disk_file_allocation == 'qemu-img'
@@ -60,17 +62,18 @@
   include_tasks: create-extra-disks.yml
   when: virtual_disks
 
-- block:
+- name: unmount root and remove mount dir
+  when: virtual_bootstrap_method == 'clone' or virtual_bootstrap_method == 'bootstrap'
+  block:
 
   - name: umount root filesystem
-    command: 'umount {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root{{ virtual_disk_suffix }}'
+    command:  # noqa no-changed-when
+      cmd: 'umount {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root{{ virtual_disk_suffix }}'
 
   - name: remove mount dir
     file:
       path: '{{ virtual_mount_path }}'
       state: absent
-
-  when: virtual_bootstrap_method == 'clone' or virtual_bootstrap_method == 'bootstrap'
 
 - name: include host boot
   include_tasks: host-boot.yml

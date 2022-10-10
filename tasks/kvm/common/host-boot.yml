@@ -17,7 +17,7 @@
 - name: create kernel storage directory
   file:
     path: '{{ virtual_kernel_base_path }}/{{ virtual_guest_name }}'
-    state: directory
+    state: directory  # noqa risky-file-permissions
 
 - name: extract kernel from disk
   command: 'virt-get-kernel --unversioned-names --add {{ virtual_kernel_disk_path }} --output {{ virtual_kernel_base_path }}/{{ virtual_guest_name }}'

@@ -59,7 +59,7 @@ virtual_disk_size_boot: 512M
 virtual_disk_type: lv
 virtual_disk_file_allocation: fallocate
 virtual_disk_file_extension: '{{ virtual_file_extension }}'
-virtual_disk_vg: "{{ virtual_template_path if virtual_disk_type == 'file' else 'vg0'}}"
+virtual_disk_vg: "{{ virtual_template_path if virtual_disk_type == 'file' else 'vg0' }}"
 virtual_disk_fs: ext4
 virtual_disk_cache: none
 virtual_disk_io: native
@@ -104,17 +104,17 @@ virtual_disk_prefixes:
   file: ''
 virtual_disk_prefix: "{{ virtual_disk_prefixes[virtual_disk_type] }}"
 virtual_disk_suffix: "{% if virtual_disk_type == 'file' %}{{ virtual_disk_file_extension }}{% endif %}"
-virtual_disks_main: "{{ ['root','boot'] if virtual_boot_method == 'part' else ['root'] }}"
+virtual_disks_main: "{{ ['root', 'boot'] if virtual_boot_method == 'part' else ['root'] }}"
 virtual_disks_main_size:
   root: '{{ virtual_disk_size_root }}'
   boot: '{{ virtual_disk_size_boot }}'
 virtual_cpus_hotpluggable: '{{ True if virtual_cpus_max > virtual_cpus else False }}'
 virtual_memory_hotpluggable: '{{ True if virtual_memory_max > virtual_memory else False }}'
-virtual_numa_cell_cpus: '0-{{ virtual_cpus_max-1 | int | abs }}'
-virtual_numa_cell_memory: '{{ virtual_memory*1024 | int | abs }}'
+virtual_numa_cell_cpus: '0-{{ virtual_cpus_max - 1 | int | abs }}'
+virtual_numa_cell_memory: '{{ virtual_memory * 1024 | int | abs }}'
 virtual_disk_boot_index: "{{ 1 if virtual_boot_method == 'part' else 0 }}"
-virtual_disks_letters_skip: '{{ virtual_disk_boot_index|int + 1 }}'
-virtual_disks_letters: "{{ virtual_disk_letters[virtual_disks_letters_skip|int:] if virtual_boot_method == 'part' else virtual_disk_letters[virtual_disks_letters_skip|int:] }}"
+virtual_disks_letters_skip: '{{ virtual_disk_boot_index | int + 1 }}'
+virtual_disks_letters: "{{ virtual_disk_letters[virtual_disks_letters_skip | int :] if virtual_boot_method == 'part' else virtual_disk_letters[virtual_disks_letters_skip | int :] }}"
 virtual_template_command: >-
   bootstrap {{ virtual_template_name_prefix }}-{{ virtual_boot_method }}-{{ virtual_codename }}
   {{ virtual_template_path if virtual_template_type == 'file' else virtual_template_vg }}
