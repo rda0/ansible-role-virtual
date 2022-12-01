@@ -1,6 +1,6 @@
 ---
 - name: "create main disks ({{ ', '.join(virtual_disks_main) }}) lv(s)"
-  lvol:
+  community.general.lvol:
     vg: '{{ virtual_disk_vg }}'
     lv: '{{ virtual_guest_name }}-{{ item }}'
     size: '{{ virtual_disks_main_size[item] }}'
@@ -8,7 +8,7 @@
   when: virtual_bootstrap_method != 'bootstrap' and virtual_disk_type == 'lv'
 
 - name: "create main disks ({{ ', '.join(virtual_disks_main) }}) zvol(s)"
-  zfs:
+  community.general.zfs:
     name: '{{ virtual_disk_vg }}/{{ virtual_guest_name }}-{{ item }}'
     state: present
     extra_zfs_properties: '{{ virtual_disk_zfs_props | combine({"volsize": virtual_disks_main_size[item]}) | combine({"volblocksize": virtual_disk_bs}) }}'

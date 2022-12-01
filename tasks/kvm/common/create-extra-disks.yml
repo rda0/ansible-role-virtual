@@ -1,6 +1,6 @@
 ---
 - name: create extra disks lvs
-  lvol:
+  community.general.lvol:
     vg: '{{ (item.1.vg | default(virtual_disk_vg)) }}'
     lv: "{{ virtual_guest_name }}{{ item.1.mount | default((item.prefix | default(virtual_disk_prefix)) + '/' + virtual_disk_bus_id + 'd' + virtual_disks_letters[item.0]) | replace('/', '-') }}"
     size: "{{ item.1.size }}"
@@ -8,7 +8,7 @@
   when: virtual_disk_type == 'lv'
 
 - name: "create extra disks zvols"
-  zfs:
+  community.general.zfs:
     name: "{{ (item.1.vg | default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.1.mount | default((item.prefix | default(virtual_disk_prefix)) + '/' + virtual_disk_bus_id + 'd' + virtual_disks_letters[item.0]) | replace('/', '-') }}"
     state: present
     extra_zfs_properties: '{{ item.1.zfs_props | default({}) | combine(virtual_disk_zfs_props) | combine({"volsize": item.1.size}) | combine({"volblocksize": item.1.bs | default(virtual_disk_bs)}) }}'
