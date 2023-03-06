@@ -23,8 +23,6 @@
 - name: mount root filesystem
   # noqa no-changed-when
   command: 'mount {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root{{ virtual_disk_suffix }} {{ virtual_mount_path }}/root'
-  args:
-    warn: false
 
 - name: check if we have syslinux
   stat:

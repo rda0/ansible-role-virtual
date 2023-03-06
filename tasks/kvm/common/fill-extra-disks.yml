@@ -29,15 +29,11 @@
 - name: mount extra disks filesystems
   # noqa no-changed-when
   command: "mount {{ (item.prefix | default(virtual_disk_prefix)) }}{{ (item.vg | default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.mount | replace('/', '-') }}{{ (item.suffix | default(virtual_disk_suffix)) }} {{ virtual_mount_path }}/{{ item.mount[1:] | replace('/', '-') }}"
-  args:
-    warn: false
   with_items: "{{ (virtual_disks | selectattr('mount', 'defined') | selectattr('import', 'undefined') | list) + (virtual_disks | selectattr('mount', 'defined') | selectattr('import', 'defined') | rejectattr('import') | list) }}"
 
 - name: move files to separate disks
   # noqa no-changed-when
   shell: "mv {{ virtual_mount_path }}/root{{ item.mount }}/* {{ virtual_mount_path }}/{{ item.mount[1:] | replace('/', '-') }}/; umount {{ (item.prefix | default(virtual_disk_prefix)) }}{{ (item.vg | default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.mount | replace('/', '-') }}{{ (item.suffix | default(virtual_disk_suffix)) }}; mount {{ (item.prefix | default(virtual_disk_prefix)) }}{{ (item.vg | default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.mount | replace('/', '-') }}{{ (item.suffix | default(virtual_disk_suffix)) }} {{ virtual_mount_path }}/root{{ item.mount }}"
-  args:
-    warn: false
   ignore_errors: yes  # noqa ignore-errors
   with_items: "{{ (virtual_disks | selectattr('mount', 'defined') | selectattr('import', 'undefined') | list) + (virtual_disks | selectattr('mount', 'defined') | selectattr('import', 'defined') | rejectattr('import') | list) }}"
 
