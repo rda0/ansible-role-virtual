@@ -132,7 +132,7 @@ virtual_bootstrap_command: >-
 virtual_kernel_base_path: '{{ virtual_base_path }}/kernel'
 virtual_kernel_disk: root
 virtual_kernel_disk_path: '{{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-{{ virtual_kernel_disk }}{{ virtual_disk_suffix }}'
-virtual_kernel_args_common: 'net.ifnames=0 biosdevname=0 nousb console=tty0 console=ttyS0,115200n8 elevator=noop'
+virtual_kernel_args_common: 'net.ifnames=0 biosdevname=0 nousb console=tty0 console=ttyS0,115200n8'
 virtual_kernel_args_root: '/dev/sda'
 virtual_kernel_args: 'root={{ virtual_kernel_args_root }} ro {{ virtual_kernel_args_common }}'
 

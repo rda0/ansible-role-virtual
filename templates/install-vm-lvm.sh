@@ -34,8 +34,8 @@ virt-install \
 --os-variant={{ os_variant }} \
 --console=pty,target_type=serial \
 --initrd-inject={{ vm_path }}/{{ virtual_guest_name }}/preseed.cfg \
---extra-args='auto=true priority=critical elevator=noop net.ifnames=0 biosdevname=0 nousb console=tty0 console=ttyS0,115200' \
---boot=kernel_args="elevator=noop net.ifnames=0 biosdevname=0 nousb console=tty0 console=ttyS0,115200" \
+--extra-args='auto=true priority=critical net.ifnames=0 biosdevname=0 nousb console=tty0 console=ttyS0,115200' \
+--boot=kernel_args="net.ifnames=0 biosdevname=0 nousb console=tty0 console=ttyS0,115200" \
 {% if virtual_mac is defined %}
 --network=bridge={{ virtual_bridge }},model=virtio,target={{ virtual_interface_name }},mac={{ virtual_mac }} \
 {% else %}
