@@ -1,4 +1,3 @@
----
 - name: bootstrap disks
   command: '{{ virtual_bootstrap_command }}'
   args:

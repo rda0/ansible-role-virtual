@@ -1,4 +1,3 @@
----
 - name: "create main disks ({{ ', '.join(virtual_disks_main) }}) lv(s)"
   community.general.lvol:
     vg: '{{ virtual_disk_vg }}'

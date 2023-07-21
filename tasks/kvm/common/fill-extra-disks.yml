@@ -1,4 +1,3 @@
----
 - name: create extra disks mount dirs
   file:
     path: "{{ virtual_mount_path }}/{{ item.mount[1:] | replace('/', '-') }}"

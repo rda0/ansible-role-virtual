@@ -1,4 +1,3 @@
----
 template_type: debian
 version: 10
 os_variant: generic

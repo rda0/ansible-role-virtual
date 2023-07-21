@@ -1,4 +1,3 @@
----
 - name: create extra disks lvs
   community.general.lvol:
     vg: '{{ (item.1.vg | default(virtual_disk_vg)) }}'

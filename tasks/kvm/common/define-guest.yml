@@ -1,4 +1,3 @@
----
 - name: define guest
   # noqa no-changed-when
   command: |

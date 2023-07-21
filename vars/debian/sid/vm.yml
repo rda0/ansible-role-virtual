@@ -1,4 +1,3 @@
----
 template_type: debian
 version: unstable
 os_variant: generic

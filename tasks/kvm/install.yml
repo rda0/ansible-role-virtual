@@ -1,4 +1,3 @@
----
 - name: set preseed vars for ({{ virtual_distribution }}/{{ virtual_codename }})
   include_vars: "{{ virtual_distribution }}/{{ virtual_codename }}/preseed.yml"
 
