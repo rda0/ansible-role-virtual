@@ -26,7 +26,7 @@
   with_items: '{{ virtual_disks | selectattr("mount", "defined") | list }}'
 
 - name: mount extra disks filesystems
-  # noqa no-changed-when
+  # noqa no-changed-when command-instead-of-module
   command: "mount {{ (item.prefix | default(virtual_disk_prefix)) }}{{ (item.vg | default(virtual_disk_vg)) }}/{{ virtual_guest_name }}{{ item.mount | replace('/', '-') }}{{ (item.suffix | default(virtual_disk_suffix)) }} {{ virtual_mount_path }}/{{ item.mount[1:] | replace('/', '-') }}"
   with_items: "{{ (virtual_disks | selectattr('mount', 'defined') | selectattr('import', 'undefined') | list) + (virtual_disks | selectattr('mount', 'defined') | selectattr('import', 'defined') | rejectattr('import') | list) }}"
 

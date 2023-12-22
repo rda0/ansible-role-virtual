@@ -20,7 +20,7 @@
     state: directory  # noqa risky-file-permissions
 
 - name: mount root filesystem
-  # noqa no-changed-when
+  # noqa no-changed-when command-instead-of-module
   command: 'mount {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root{{ virtual_disk_suffix }} {{ virtual_mount_path }}/root'
 
 - name: check if we have syslinux
@@ -51,6 +51,7 @@
   block:
 
   - name: modify syslinux root uuid
+    # noqa command-instead-of-module
     shell: 'sed -i "s/\/dev\/sda/UUID=$(blkid -s UUID -o value {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root{{ virtual_disk_suffix }})/" {{ virtual_mount_path }}/root/syslinux.cfg'
     when: virtual_guest_syslinux_stat.stat.exists
 
@@ -59,7 +60,7 @@
     block:
 
     - name: modify fstab root uuid
-      # noqa no-changed-when
+      # noqa no-changed-when command-instead-of-module
       shell: 'sed -i "s/\/dev\/sda/UUID=$(blkid -s UUID -o value {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root{{ virtual_disk_suffix }})/" {{ virtual_mount_path }}/root/etc/fstab'
 
   - name: when virtual boot method is part
@@ -67,11 +68,11 @@
     block:
 
     - name: modify fstab root uuid
-      # noqa no-changed-when
+      # noqa no-changed-when command-instead-of-module
       shell: 'sed -i "s/\/dev\/sdb/UUID=$(blkid -s UUID -o value {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root{{ virtual_disk_suffix }})/" {{ virtual_mount_path }}/root/etc/fstab'
 
     - name: modify fstab root uuid
-      # noqa no-changed-when
+      # noqa no-changed-when command-instead-of-module
       shell: 'sed -i "s/\/dev\/sda1/UUID=$(blkid -s UUID -o value {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-boot{{ virtual_disk_suffix }})/" {{ virtual_mount_path }}/root/etc/fstab'
 
 - name: set hostname
