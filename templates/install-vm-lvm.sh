@@ -30,8 +30,7 @@ virt-install \
 {% endif %}
 --disk=path={{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root{{ virtual_disk_suffix }},bus={{ virtual_disk_bus }},cache=none \
 --location={{ location }} \
---os-type=linux \
---os-variant={{ os_variant }} \
+--osinfo={{ virtual_osinfo }} \
 --console=pty,target_type=serial \
 --initrd-inject={{ vm_path }}/{{ virtual_guest_name }}/preseed.cfg \
 --extra-args='auto=true priority=critical net.ifnames=0 biosdevname=0 nousb console=tty0 console=ttyS0,115200' \

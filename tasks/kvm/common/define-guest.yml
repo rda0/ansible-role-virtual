@@ -58,8 +58,7 @@
     {% if virtual_boot_method == 'preseed' %}
     --initrd-inject={{ virtual_preseed_path }}
     {% endif %}
-    --os-type=linux \
-    --os-variant={{ virtual_os_variant }} \
+    --osinfo={{ virtual_osinfo }} \
     --console=pty,target_type=serial \
     {% if virtual_boot_method == 'host' %}
     --boot=kernel={{ virtual_kernel_base_path }}/{{ virtual_guest_name }}/vmlinuz,initrd={{ virtual_kernel_base_path }}/{{ virtual_guest_name }}/initrd.img,kernel_args="{{ virtual_kernel_args }}" \

@@ -25,8 +25,7 @@ virt-install \
 --controller=type=scsi,model=virtio-scsi \
 {% endif %}
 --disk=path={{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root{{ virtual_disk_suffix }},bus={{ virtual_disk_bus }},cache=none \
---os-type=linux \
---os-variant={{ os_variant }} \
+--osinfo={{ virtual_osinfo }} \
 --console=pty,target_type=serial \
 --boot=kernel=/vmlinuz,initrd=/initrd.img,kernel_args="root=/dev/sda net.ifnames=0 biosdevname=0 nousb console=tty0 console=ttyS0,115200 serial" \
 {% if virtual_mac is defined %}

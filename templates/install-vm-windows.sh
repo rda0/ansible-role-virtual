@@ -12,8 +12,7 @@ virt-install \
 {% endif %}
 --disk=/var/lib/libvirt/images/{{ virtual_guest_name }}.qcow2,format=qcow2,size={{ virtual_disk_size_root }},bus={{ virtual_disk_bus }},cache=none \
 --cdrom={{ location }} \
---os-type=windows \
---os-variant={{ os_variant }} \
+--osinfo={{ virtual_osinfo }} \
 {% if virtual_mac is defined %}
 --network=bridge={{ virtual_bridge }},model=e1000,mac={{ virtual_mac }} \
 {% else %}

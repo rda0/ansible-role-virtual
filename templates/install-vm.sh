@@ -12,8 +12,7 @@ virt-install \
 {% endif %}
 --disk=/var/lib/libvirt/images/{{ virtual_guest_name }}.qcow2,format=qcow2,size={{ virtual_disk_size_root }},bus={{ virtual_disk_bus }},cache=none \
 --location={{ location }} \
---os-type=linux \
---os-variant={{ os_variant }} \
+--osinfo={{ virtual_osinfo }} \
 --console=pty,target_type=serial \
 --initrd-inject={{ vm_path }}/{{ virtual_guest_name }}/preseed.cfg \
 --extra-args='auto=true priority=critical console=ttyS0,115200n8 serial' \

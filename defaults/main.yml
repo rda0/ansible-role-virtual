@@ -34,7 +34,10 @@ virtual_template_disk_size_root: "{{ '3G' if virtual_distribution == 'ubuntu' el
 virtual_template_type: file
 virtual_template_name_prefix: tpl
 virtual_template_file_extension: '{{ virtual_file_extension }}'
-virtual_os_variant: generic
+# For osinfo values see `virt-install --osinfo list` or `osinfo-query os`
+virtual_osinfo: generic
+# TODO: switch to use osinfo for specific releases
+#virtual_osinfo: '{{ virtual_distribution }}{{ virtual_codename }}'
 virtual_arch: amd64
 virtual_machine_type: ''
 virtual_mirrors:
