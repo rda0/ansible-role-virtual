@@ -1,8 +1,0 @@
-template_type: debian
-version: 10
-os_variant: generic
-arch: amd64
-initrd_inject: preseed.cfg
-# switch back when buster is released
-#location: http://debian.ethz.ch/debian/dists/{{ virtual_codename }}/main/installer-{{ arch }}/
-location: https://d-i.debian.org/daily-images/{{ arch }}/
