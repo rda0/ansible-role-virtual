@@ -2,7 +2,7 @@
   template:
     src: kvm/qemu.j2
     dest: /etc/libvirt/hooks/qemu
-    mode: 0755
+    mode: '0755'
   when: virtual_qemu_hook_create
 
 - name: create kernel base path

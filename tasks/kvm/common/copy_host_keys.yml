@@ -4,7 +4,7 @@
     dest: "{{ virtual_mount_path }}/root/etc/ssh/ssh_host_{{ ssh_host_key_type }}_key.pub"
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'
   no_log: true
 
 - name: copy private ssh host {{ ssh_host_key_type }} key
@@ -13,5 +13,5 @@
     dest: "{{ virtual_mount_path }}/root/etc/ssh/ssh_host_{{ ssh_host_key_type }}_key"
     owner: root
     group: root
-    mode: 0600
+    mode: '0600'
   no_log: true

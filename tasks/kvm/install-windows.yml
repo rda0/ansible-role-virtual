@@ -15,7 +15,7 @@
     state: directory
     owner: root
     group: root
-    mode: 0700
+    mode: '0700'
   with_items:
     - "{{ vm_path }}/{{ virtual_guest_name }}"
 
@@ -25,7 +25,7 @@
     dest: "{{ vm_path }}/{{ virtual_guest_name }}/install-vm.sh"
     owner: root
     group: root
-    mode: 0770
+    mode: '0770'
 
 - name: print info
   debug:
