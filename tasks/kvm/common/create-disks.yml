@@ -57,7 +57,7 @@
 
 - name: include extra disks
   include_tasks: create-extra-disks.yml
-  when: virtual_disks
+  when: virtual_disks | length > 0
 
 - name: unmount root and remove mount dir
   when: virtual_bootstrap_method == 'clone' or virtual_bootstrap_method == 'bootstrap'
