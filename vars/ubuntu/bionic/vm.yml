@@ -1,6 +1,0 @@
-template_type: ubuntu
-version: 18.04
-os_variant: generic
-arch: amd64
-initrd_inject: preseed.cfg
-location: http://ubuntu.ethz.ch/ubuntu/dists/{{ virtual_codename }}/main/installer-{{ arch }}/

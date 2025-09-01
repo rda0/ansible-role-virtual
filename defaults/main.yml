@@ -30,7 +30,7 @@ virtual_base_path: /var/virtual
 virtual_file_extension: ''
 virtual_template_vg: vg0
 virtual_template_path: '{{ virtual_base_path }}/images'
-virtual_template_disk_size_root: "{{ '3G' if virtual_distribution == 'ubuntu' else '2G' }}"
+virtual_template_disk_size_root: '2G'
 virtual_template_type: file
 virtual_template_name_prefix: tpl
 virtual_template_file_extension: '{{ virtual_file_extension }}'

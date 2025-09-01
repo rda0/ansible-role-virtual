@@ -7,12 +7,6 @@ export DEBIAN_PRIORITY=critical
 export DEBIAN_FRONTEND=noninteractive
 apt-get install -y lsb-release
 
-if [ $(lsb_release -s -i) = 'Ubuntu' ]; then
-    if ! which wget; then
-        apt-get install -y wget
-    fi
-fi
-
 /bin/sed 's/\PermitRootLogin\ yes/PermitRootLogin\ without-password/' -i /etc/ssh/sshd_config
 /bin/mkdir /root/.ssh/
 /bin/chmod 700 /root/.ssh/ ; \
