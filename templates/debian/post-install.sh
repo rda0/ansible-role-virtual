@@ -22,7 +22,7 @@ cat > /usr/local/bin/ansible-notify.sh << 'EOF'
 
 HOSTNAME="$(hostname -s)"
 IP="$(host ${HOSTNAME} | grep -iEo '[.0-9]+$')"
-GET "http://{{ ansible_fqdn }}/webapp/index?hostname=${HOSTNAME}&ip=${IP}"
+GET "http://{{ ansible_facts.fqdn }}/webapp/index?hostname=${HOSTNAME}&ip=${IP}"
 EOF
 
 chmod +x /usr/local/bin/ansible-notify.sh
