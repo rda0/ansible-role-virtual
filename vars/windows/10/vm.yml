@@ -1,5 +1,0 @@
-template_type: windows
-version: 10
-os_variant: generic
-location: /opt/iso/windows/win_clt_10.iso
-driver: /opt/iso/windows/virtio-win.iso

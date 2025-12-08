@@ -1,5 +1,0 @@
-template_type: kali
-version: rolling
-os_variant: generic
-arch: amd64
-location: http://http.kali.org/dists/{{ virtual_codename }}/main/installer-{{ arch }}/
