@@ -76,6 +76,7 @@ virtual_disk_by_uuid: True
 virtual_disk_mount_options: noatime,nodiratime
 virtual_disk_letters: 'abcdefghijklmnopqrstuvwxyz'
 virtual_disk_zfs_props: {}
+virtual_disk_error_policy: ''
 virtual_disks: []
 virtual_bridge: br0
 virtual_interface_suffix: ''

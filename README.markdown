@@ -176,6 +176,7 @@ To create additional disks to be used as mount points, use the `virtual_disks` d
         - mount: /var
           size: 2G
         - mount: /var/log
+          error_policy: report
           size: 2G
         - mount: /export
           size: 100G
@@ -210,6 +211,7 @@ The above will create (or import) the following disks and mount points:
 - `disk.fs`: default is `virtual_disk_fs`
 - `disk.options`: default is `virtual_disk_mount_options`
 - `disk.import`: when `True` import existing disk, disk contents will not be modified (only use leaf mount points)
+- `disk.error_policy`: the default is left to the discretion of the hypervisor, usually the VM is stopped/paused on IO errors. Use `report` to report the error to the guest OS instead.
 
 To import disks from other disk types, override `prefix`, `suffix` and `vg` accordingly, example:
 
@@ -265,6 +267,7 @@ virtual_disks:
     zfs_props:
       compression: 'off'
   - mount: /var/log
+    error_policy: report
     size: 2G
     bs: 32K
     zfs_props:
