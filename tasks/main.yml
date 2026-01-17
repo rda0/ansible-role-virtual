@@ -2,29 +2,29 @@
   tags: virtual
   block:
 
-  - name: block delegated to hypervisor
-    delegate_to: '{{ virtual_hypervisor_host }}'
-    when: virtual_hypervisor_type is defined
-    block:
+    - name: block delegated to hypervisor
+      delegate_to: '{{ virtual_hypervisor_host }}'
+      when: virtual_hypervisor_type is defined
+      block:
 
-    - name: include '{{ virtual_hypervisor_type }}/{{ virtual_bootstrap_method }}.yml'
-      include_tasks: '{{ virtual_hypervisor_type }}/{{ virtual_bootstrap_method }}.yml'
-      tags: virtual_bootstrap
-      when: include_virtual_bootstrap
+        - name: include '{{ virtual_hypervisor_type }}/{{ virtual_bootstrap_method }}.yml'
+          include_tasks: '{{ virtual_hypervisor_type }}/{{ virtual_bootstrap_method }}.yml'
+          tags: virtual_bootstrap
+          when: include_virtual_bootstrap
 
-  - name: wait for virtual host to become ready
-    wait_for_connection:
-      timeout: '{{ virtual_post_bootstrap_timeout }}'
-    tags: virtual_post_bootstrap
+    - name: wait for virtual host to become ready
+      wait_for_connection:
+        timeout: '{{ virtual_post_bootstrap_timeout }}'
+      tags: virtual_post_bootstrap
 
-  - name: gather facts
-    setup:
-    tags: always
+    - name: gather facts
+      setup:
+      tags: always
 
-  - name: "post bootstrap remove packages ({{ ', '.join(virtual_post_bootstrap_remove_packages) }})"
-    package:
-      pkg: '{{ virtual_post_bootstrap_remove_packages }}'
-      state: absent
-      purge: "{{ virtual_post_bootstrap_remove_purge | ternary('yes', 'no') }}"
-      autoremove: "{{ virtual_post_bootstrap_remove_autoremove | ternary('yes', 'no') }}"
-    tags: virtual_post_bootstrap
+    - name: "post bootstrap remove packages ({{ ', '.join(virtual_post_bootstrap_remove_packages) }})"
+      package:
+        pkg: '{{ virtual_post_bootstrap_remove_packages }}'
+        state: absent
+        purge: "{{ virtual_post_bootstrap_remove_purge | ternary('yes', 'no') }}"
+        autoremove: "{{ virtual_post_bootstrap_remove_autoremove | ternary('yes', 'no') }}"
+      tags: virtual_post_bootstrap

@@ -32,48 +32,48 @@
   when: not virtual_disk_by_uuid
   block:
 
-  - name: modify syslinux bus id
-    replace:
-      path: '{{ virtual_mount_path }}/root/syslinux.cfg'
-      regexp: '/dev/sd'
-      replace: '/dev/{{ virtual_disk_bus_id }}d'
-    when: virtual_disk_bus_id != 's' and virtual_guest_syslinux_stat.stat.exists
+    - name: modify syslinux bus id
+      replace:
+        path: '{{ virtual_mount_path }}/root/syslinux.cfg'
+        regexp: '/dev/sd'
+        replace: '/dev/{{ virtual_disk_bus_id }}d'
+      when: virtual_disk_bus_id != 's' and virtual_guest_syslinux_stat.stat.exists
 
-  - name: modify fstab bus id
-    replace:
-      path: '{{ virtual_mount_path }}/root/etc/fstab'
-      regexp: '/dev/sd'
-      replace: '/dev/{{ virtual_disk_bus_id }}d'
-    when: virtual_disk_bus_id != 's'
+    - name: modify fstab bus id
+      replace:
+        path: '{{ virtual_mount_path }}/root/etc/fstab'
+        regexp: '/dev/sd'
+        replace: '/dev/{{ virtual_disk_bus_id }}d'
+      when: virtual_disk_bus_id != 's'
 
 - name: when virtual disk by uuid
   when: virtual_disk_by_uuid
   block:
 
-  - name: modify syslinux root uuid
-    # noqa command-instead-of-module
-    shell: 'sed -i "s/\/dev\/sda/UUID=$(blkid -s UUID -o value {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root{{ virtual_disk_suffix }})/" {{ virtual_mount_path }}/root/syslinux.cfg'
-    when: virtual_guest_syslinux_stat.stat.exists
+    - name: modify syslinux root uuid
+      # noqa command-instead-of-module
+      shell: 'sed -i "s/\/dev\/sda/UUID=$(blkid -s UUID -o value {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root{{ virtual_disk_suffix }})/" {{ virtual_mount_path }}/root/syslinux.cfg'
+      when: virtual_guest_syslinux_stat.stat.exists
 
-  - name: when virtual boot method is not part
-    when: virtual_boot_method != 'part'
-    block:
+    - name: when virtual boot method is not part
+      when: virtual_boot_method != 'part'
+      block:
 
-    - name: modify fstab root uuid
-      # noqa no-changed-when command-instead-of-module
-      shell: 'sed -i "s/\/dev\/sda/UUID=$(blkid -s UUID -o value {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root{{ virtual_disk_suffix }})/" {{ virtual_mount_path }}/root/etc/fstab'
+        - name: modify fstab root uuid
+          # noqa no-changed-when command-instead-of-module
+          shell: 'sed -i "s/\/dev\/sda/UUID=$(blkid -s UUID -o value {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root{{ virtual_disk_suffix }})/" {{ virtual_mount_path }}/root/etc/fstab'
 
-  - name: when virtual boot method is part
-    when: virtual_boot_method == 'part'
-    block:
+    - name: when virtual boot method is part
+      when: virtual_boot_method == 'part'
+      block:
 
-    - name: modify fstab root uuid
-      # noqa no-changed-when command-instead-of-module
-      shell: 'sed -i "s/\/dev\/sdb/UUID=$(blkid -s UUID -o value {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root{{ virtual_disk_suffix }})/" {{ virtual_mount_path }}/root/etc/fstab'
+        - name: modify fstab root uuid
+          # noqa no-changed-when command-instead-of-module
+          shell: 'sed -i "s/\/dev\/sdb/UUID=$(blkid -s UUID -o value {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root{{ virtual_disk_suffix }})/" {{ virtual_mount_path }}/root/etc/fstab'
 
-    - name: modify fstab root uuid
-      # noqa no-changed-when command-instead-of-module
-      shell: 'sed -i "s/\/dev\/sda1/UUID=$(blkid -s UUID -o value {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-boot{{ virtual_disk_suffix }})/" {{ virtual_mount_path }}/root/etc/fstab'
+        - name: modify fstab root uuid
+          # noqa no-changed-when command-instead-of-module
+          shell: 'sed -i "s/\/dev\/sda1/UUID=$(blkid -s UUID -o value {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-boot{{ virtual_disk_suffix }})/" {{ virtual_mount_path }}/root/etc/fstab'
 
 - name: set hostname
   # noqa no-changed-when

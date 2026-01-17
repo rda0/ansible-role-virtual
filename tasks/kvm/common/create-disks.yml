@@ -63,14 +63,14 @@
   when: virtual_bootstrap_method == 'clone' or virtual_bootstrap_method == 'bootstrap'
   block:
 
-  - name: umount root filesystem
-    # noqa no-changed-when
-    command: 'umount {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root{{ virtual_disk_suffix }}'
+    - name: umount root filesystem
+      # noqa no-changed-when
+      command: 'umount {{ virtual_disk_prefix }}{{ virtual_disk_vg }}/{{ virtual_guest_name }}-root{{ virtual_disk_suffix }}'
 
-  - name: remove mount dir
-    file:
-      path: '{{ virtual_mount_path }}'
-      state: absent
+    - name: remove mount dir
+      file:
+        path: '{{ virtual_mount_path }}'
+        state: absent
 
 - name: include host boot
   include_tasks: host-boot.yml

@@ -5,18 +5,18 @@
   when: virtual_boot_method == 'preseed'
   block:
 
-  - name: create preseed base path
-    file:
-      path: '{{ virtual_preseed_base_path }}'
-      state: directory
-      owner: root
-      group: libvirt-qemu
-      mode: '0750'
+    - name: create preseed base path
+      file:
+        path: '{{ virtual_preseed_base_path }}'
+        state: directory
+        owner: root
+        group: libvirt-qemu
+        mode: '0750'
 
-  - name: create preseed file
-    template:
-      src: '{{ virtual_preseed_template_type }}/{{ virtual_preseed_filename }}'
-      dest: '{{ virtual_preseed_path }}'  # noqa risky-file-permissions
+    - name: create preseed file
+      template:
+        src: '{{ virtual_preseed_template_type }}/{{ virtual_preseed_filename }}'
+        dest: '{{ virtual_preseed_path }}'  # noqa risky-file-permissions
 
 - name: include check
   include_tasks: common/check.yml
