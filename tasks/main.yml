@@ -21,6 +21,12 @@
       setup:
       tags: always
 
+    - name: "post bootstrap install packages ({{ ', '.join(virtual_post_bootstrap_install_packages) }})"
+      package:
+        pkg: '{{ virtual_post_bootstrap_install_packages }}'
+        state: present
+      tags: virtual_post_bootstrap
+
     - name: "post bootstrap remove packages ({{ ', '.join(virtual_post_bootstrap_remove_packages) }})"
       package:
         pkg: '{{ virtual_post_bootstrap_remove_packages }}'

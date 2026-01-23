@@ -1,0 +1,44 @@
+- name: 'lxc: create instance'
+  command:
+    cmd: >
+      incus create images:{{ virtual_distribution }}/{{ virtual_codename }} {{ virtual_guest_name }}
+      --device eth0,host_name={{ virtual_interface_name }}
+      --device eth0,parent={{ virtual_bridge }}
+      --device eth0,hwaddr={{ virtual_mac }}
+    creates: '{{ virtual_container_path }}/containers/{{ virtual_guest_name }}'
+
+- name: 'lxc: start instance'
+  command:
+    cmd: >
+      incus start {{ virtual_guest_name }}
+    creates: '{{ virtual_container_path }}/containers/{{ virtual_guest_name }}/rootfs'
+
+- name: 'lxc: install ssh server'
+  command:
+    cmd: >
+      incus exec {{ virtual_guest_name }} -- apt install -y openssh-server
+    creates: '{{ virtual_container_path }}/containers/{{ virtual_guest_name }}/rootfs/usr/sbin/sshd'
+
+- name: check if authorized_keys is present
+  stat:
+    path: '{{ virtual_container_path }}/containers/{{ virtual_guest_name }}/rootfs/root/.ssh/authorized_keys'
+  register: virtual_lxc_stat_authorized_keys
+
+- name: include tasks from copy_host_keys.yml
+  include_tasks: copy_host_keys.yml
+  loop: '{{ virtual_ssh_host_key_types }}'
+  loop_control:
+    loop_var: ssh_host_key_type
+  when: not virtual_lxc_stat_authorized_keys.stat.exists and virtual_ssh_host_key_types | length > 0 and virtual_ssh_host_keys_public | length > 0 and virtual_ssh_host_keys_private | length > 0
+
+- name: 'lxc: push initial ssh authorized_keys'
+  command:
+    cmd: >
+      incus file push /root/.ssh/authorized_keys {{ virtual_guest_name }}/root/.ssh/authorized_keys
+    creates: '{{ virtual_container_path }}/containers/{{ virtual_guest_name }}/rootfs/root/.ssh/authorized_keys'
+
+- name: 'lxc: install minimal packages'
+  command:
+    cmd: >
+      incus exec {{ virtual_guest_name }} -- apt install -y {{ virtual_container_packages_install | join(' ') }}
+    creates: '{{ virtual_container_path }}/containers/{{ virtual_guest_name }}/rootfs/usr/bin/python3'

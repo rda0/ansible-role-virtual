@@ -1,0 +1,37 @@
+- name: 'lxc: deploy public {{ ssh_host_key_type }} key to hypervisor /tmp'
+  copy:
+    content: '{{ virtual_ssh_host_keys_public[ssh_host_key_type] }}'
+    dest: '/tmp/{{ virtual_guest_name }}_ssh_host_{{ ssh_host_key_type }}_key.pub'
+    owner: root
+    group: root
+    mode: '0644'
+  no_log: true
+
+- name: 'lxc: deploy private {{ ssh_host_key_type }} key to hypervisor /tmp'
+  copy:
+    content: '{{ virtual_ssh_host_keys_private[ssh_host_key_type] }}'
+    dest: '/tmp/{{ virtual_guest_name }}_ssh_host_{{ ssh_host_key_type }}_key'
+    owner: root
+    group: root
+    mode: '0600'
+  no_log: true
+
+- name: 'lxc: push initial public ssh key'
+  command:
+    cmd: >
+      incus file push /tmp/{{ virtual_guest_name }}_ssh_host_{{ ssh_host_key_type }}_key.pub
+      {{ virtual_guest_name }}/etc/ssh/ssh_host_{{ ssh_host_key_type }}_key.pub
+
+- name: 'lxc: push initial private ssh key'
+  command:
+    cmd: >
+      incus file push /tmp/{{ virtual_guest_name }}_ssh_host_{{ ssh_host_key_type }}_key
+      {{ virtual_guest_name }}/etc/ssh/ssh_host_{{ ssh_host_key_type }}_key
+
+- name: 'lxc: cleanup ssh keys in hypervisor /tmp'
+  file:
+    path: '{{ item }}'
+    state: absent
+  loop:
+    - '/tmp/{{ virtual_guest_name }}_ssh_host_{{ ssh_host_key_type }}_key'
+    - '/tmp/{{ virtual_guest_name }}_ssh_host_{{ ssh_host_key_type }}_key.pub'

@@ -1,5 +1,6 @@
 include_virtual_bootstrap: True
 virtual_post_bootstrap_timeout: 900
+virtual_post_bootstrap_install_packages: []
 virtual_post_bootstrap_remove_packages: ['haveged']
 virtual_post_bootstrap_remove_purge: True
 virtual_post_bootstrap_remove_autoremove: True
@@ -24,7 +25,10 @@ virtual_template_create: True
 # ------------------------------------------------------
 
 virtual_guest_name: '{{ inventory_hostname }}'
-virtual_bootstrap_method: clone
+virtual_bootstrap_method_defaults:
+  kvm: clone
+  lxc: create
+virtual_bootstrap_method: '{{ virtual_bootstrap_method_defaults[virtual_hypervisor_type] }}'
 virtual_boot_method: fs
 virtual_base_path: /var/virtual
 virtual_file_extension: ''
@@ -34,6 +38,11 @@ virtual_template_disk_size_root: '2G'
 virtual_template_type: file
 virtual_template_name_prefix: tpl
 virtual_template_file_extension: '{{ virtual_file_extension }}'
+virtual_container_path: /var/lib/incus
+virtual_container_packages_install:
+  - python3-minimal
+  - python3-apt
+  - python-is-python3
 # For osinfo values see `virt-install --osinfo list` or `osinfo-query os`
 virtual_osinfo: generic
 # TODO: switch to use osinfo for specific releases
