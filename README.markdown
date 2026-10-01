@@ -160,7 +160,7 @@ To create additional disks to be used as mount points, use the `virtual_disks` d
     - virtual_bootstrap_method: clone
     - virtual_boot_method: fs
     - virtual_distribution: debian
-    - virtual_codename: bullseye
+    - virtual_codename: sid
     - virtual_template_path: /var/virtual/images
     - virtual_template_type: file
     - virtual_template_name_prefix: tpl
