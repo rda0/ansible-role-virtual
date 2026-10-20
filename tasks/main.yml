@@ -8,8 +8,11 @@
       block:
 
         - name: include '{{ virtual_hypervisor_type }}/{{ virtual_bootstrap_method }}.yml'
-          include_tasks: '{{ virtual_hypervisor_type }}/{{ virtual_bootstrap_method }}.yml'
-          tags: virtual_bootstrap
+          include_tasks:
+            file: '{{ virtual_hypervisor_type }}/{{ virtual_bootstrap_method }}.yml'
+            apply:
+              tags: virtual_bootstrap
+          tags: always
           when: include_virtual_bootstrap
 
     - name: wait for virtual host to become ready
