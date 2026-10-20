@@ -39,6 +39,11 @@ virtual_template_type: file
 virtual_template_name_prefix: tpl
 virtual_template_file_extension: '{{ virtual_file_extension }}'
 virtual_container_path: /var/lib/incus
+virtual_container_image_definition_repo_url: 'https://gitlab.phys.ethz.ch/isgphys/lxc-ci'
+virtual_container_image_definition_repo_path: '{{ virtual_base_path }}/lxc-ci'
+virtual_container_image_definition_path: '{{ virtual_container_image_definition_repo_path }}/images'
+virtual_container_image_path: '{{ virtual_template_path }}/{{ virtual_distribution }}/{{ virtual_codename }}/{{ virtual_arch }}/default'
+virtual_container_remote: local
 virtual_container_packages_install:
   - python3-minimal
   - python3-apt

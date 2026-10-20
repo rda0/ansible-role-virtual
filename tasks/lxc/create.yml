@@ -1,7 +1,66 @@
+- name: list incus images
+  command:
+    cmd: >
+      incus -q image list local: -f json {{ virtual_distribution }}/{{ virtual_codename }}
+  register: virtual_lxc_images
+  changed_when: false
+  check_mode: false
+  tags: virtual_lxc_create
+  when: virtual_container_remote == 'local'
+
+- name: create or update incus image
+  tags: virtual_lxc_create
+  when: virtual_container_remote == 'local' and virtual_lxc_images.stdout | from_json | length == 0
+  # TODO: this works, but ugly (automatically builds new image if older than 30 days)
+  #when: >-
+  #  (virtual_container_remote == 'local') and
+  #  (
+  #    (virtual_lxc_images.stdout | from_json | length == 0) or
+  #    (
+  #      (
+  #        (
+  #          (now(utc=true, fmt='%Y-%m-%dT%H:%M:%S') ~ '+00:00')
+  #          | to_datetime('%Y-%m-%dT%H:%M:%S%z')
+  #        ) -
+  #        (
+  #          (virtual_lxc_images.stdout | from_json)[0].created_at
+  #          | regex_replace('\.\d+', '')
+  #          | to_datetime('%Y-%m-%dT%H:%M:%S%z')
+  #        )
+  #      ).total_seconds() > 30 * 24 * 60 * 60
+  #    )
+  #  )
+  block:
+
+    - name: clone container image definition repo
+      git:
+        repo: '{{ virtual_container_image_definition_repo_url }}'
+        dest: '{{ virtual_container_image_definition_repo_path }}'
+        update: yes
+        force: yes
+        depth: 1
+
+    - name: build incus image
+      command:
+        cmd: >
+          distrobuilder build-incus
+          -o image.release={{ virtual_codename }}
+          -o image.architecture={{ virtual_arch }}
+          {{ virtual_container_image_definition_path }}/{{ virtual_distribution }}.yaml
+          {{ virtual_container_image_path }}
+
+    - name: import incus image
+      command:
+        cmd: >
+          incus -q image import
+          {{ virtual_container_image_path }}/incus.tar.xz
+          {{ virtual_container_image_path }}/rootfs.squashfs
+          --alias {{ virtual_distribution }}/{{ virtual_codename }}
+
 - name: 'lxc: create instance'
   command:
     cmd: >
-      incus create images:{{ virtual_distribution }}/{{ virtual_codename }} {{ virtual_guest_name }}
+      incus -q create {{ virtual_container_remote }}:{{ virtual_distribution }}/{{ virtual_codename }} {{ virtual_guest_name }}
       --device eth0,host_name={{ virtual_interface_name }}
       --device eth0,parent={{ virtual_bridge }}
       --device eth0,hwaddr={{ virtual_mac }}
@@ -10,13 +69,13 @@
 - name: 'lxc: start instance'
   command:
     cmd: >
-      incus start {{ virtual_guest_name }}
+      incus -q start {{ virtual_guest_name }}
     creates: '{{ virtual_container_path }}/containers/{{ virtual_guest_name }}/rootfs'
 
 - name: 'lxc: install ssh server'
   command:
     cmd: >
-      incus exec {{ virtual_guest_name }} -- apt install -y openssh-server
+      incus -q exec {{ virtual_guest_name }} -- apt install -y openssh-server
     creates: '{{ virtual_container_path }}/containers/{{ virtual_guest_name }}/rootfs/usr/sbin/sshd'
 
 - name: check if authorized_keys is present
@@ -34,11 +93,11 @@
 - name: 'lxc: push initial ssh authorized_keys'
   command:
     cmd: >
-      incus file push /root/.ssh/authorized_keys {{ virtual_guest_name }}/root/.ssh/authorized_keys
+      incus -q file push /root/.ssh/authorized_keys {{ virtual_guest_name }}/root/.ssh/authorized_keys
     creates: '{{ virtual_container_path }}/containers/{{ virtual_guest_name }}/rootfs/root/.ssh/authorized_keys'
 
 - name: 'lxc: install minimal packages'
   command:
     cmd: >
-      incus exec {{ virtual_guest_name }} -- apt install -y {{ virtual_container_packages_install | join(' ') }}
+      incus -q exec {{ virtual_guest_name }} -- apt install -y {{ virtual_container_packages_install | join(' ') }}
     creates: '{{ virtual_container_path }}/containers/{{ virtual_guest_name }}/rootfs/usr/bin/python3'
